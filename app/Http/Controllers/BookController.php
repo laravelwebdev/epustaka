@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\DownloadBookFile;
 use App\Models\Book;
 use Illuminate\Http\Request;
 
@@ -23,6 +22,8 @@ class BookController extends Controller
             'using_drm' => 'boolean',
             'borrowed' => 'boolean',
             'path' => 'nullable|string',
+            'language' => 'nullable|string',
+            'publisher' => 'nullable|string',
         ]);
 
         // Cek apakah sudah ada berdasarkan book_id
@@ -33,7 +34,6 @@ class BookController extends Controller
 
         // Simpan data baru
         $book = Book::create($validated);
-
 
         return response()->json(['message' => 'Book saved and queued for download.'], 201);
     }
@@ -46,7 +46,7 @@ class BookController extends Controller
         ]);
 
         $book = Book::where('book_id', $validated['book_id'])->first();
-        if (!$book) {
+        if (! $book) {
             return response()->json(['message' => 'Book not found.'], 404);
         }
 
@@ -64,7 +64,7 @@ class BookController extends Controller
         ]);
 
         $book = Book::where('book_id', $validated['book_id'])->first();
-        if (!$book) {
+        if (! $book) {
             return response()->json(['message' => 'Book not found.'], 404);
         }
 
