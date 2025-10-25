@@ -22,5 +22,7 @@ class Book extends Model
         'using_drm',
         'borrowed',
         'path',
+        'language',
+        'publisher',
     ];
 }
