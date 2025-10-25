@@ -35,7 +35,7 @@ class BookController extends Controller
         // Simpan data baru
         $book = Book::create($validated);
 
-        return response()->json(['message' => 'Book saved and queued for download.'], 201);
+        return response()->json(['message' => 'Book saved.'], 201);
     }
 
     public function updateBookPathToServer(Request $request)
