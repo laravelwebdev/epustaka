@@ -1,0 +1,38 @@
+services:
+  app:
+    build: ./docker/app
+    volumes:
+      - ../:/epustaka:cached
+    ports:
+      - 80:80
+    tty: true
+    environment:
+      APP_ENV: local
+      APACHE_DOCUMENT_ROOT: /epustaka/public
+    depends_on:
+      - mariadb
+      - phpmyadmin
+    labels:
+      - dev.orbstack.domains=epustaka.local
+
+  mariadb:
+    image: 'mariadb:10.11'
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_ROOT_HOST: 'mariadb'
+      MYSQL_DATABASE: 'epustaka'
+      MYSQL_USER: 'homestead'
+      MYSQL_PASSWORD: 'secret'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+
+  phpmyadmin:
+    image: 'phpmyadmin:latest'
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+      - UPLOAD_LIMIT=64M
+    labels:
+      - dev.orbstack.domains=phpmyadmin.local

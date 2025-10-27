@@ -1,0 +1,45 @@
+{
+    "name": "codespace-laravel",
+    "dockerComposeFile": [
+        "docker-compose.yml"
+    ],
+    "workspaceFolder": "/epustaka",
+    "service": "app",
+    "shutdownAction": "stopCompose",
+    "postCreateCommand": "bash ./.devcontainer/setup.sh",
+    "forwardPorts": [
+        80,
+        3306,
+        8080
+    ],
+    "portsAttributes": {
+        "80": {
+            "label": "HTTP"
+        },
+        "3306": {
+            "label": "MySQL"
+        },
+        "8080": {
+            "label": "PHPMyAdmin"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "lyn-inc.HTML-Speed-Viewer",
+                "oderwat.indent-rainbow",
+                "laravel.vscode-laravel",
+                "open-southeners.laravel-pint",
+                "shd101wyy.markdown-preview-enhanced",
+                "unifiedjs.vscode-mdx",
+                "Cardinal90.multi-cursor-case-preserve",
+                "bmewburn.vscode-intelephense-client",
+                "MehediDracula.php-namespace-resolver",
+                "fabiospampinato.vscode-todo-plus",
+                "AntiAntiSepticeye.vscode-color-picker"
+            ]
+        }
+    }
+}
