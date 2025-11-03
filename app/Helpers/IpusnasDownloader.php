@@ -2,55 +2,50 @@
 
 namespace App\Helpers;
 
+use App\Models\Account;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class IpusnasDownloader
 {
     protected $bookId;
 
-    protected $apiLogin;
+    protected $apiLogin = 'https://api2-ipusnas.perpusnas.go.id/api/auth/login';
 
-    protected $apiBookDetail;
+    protected $apiBookDetail = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-detail?book_id=';
 
-    protected $apiCheckBorrowBook;
+    protected $apiCheckBorrowBook = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/check-borrow-status?book_id=';
 
-    protected $apiReturnBook;
+    protected $apiReturnBook = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-return';
 
-    protected $apiBorrowBook;
+    protected $apiBorrowBook = 'https://api2-ipusnas.perpusnas.go.id/agent/webhook/borrow';
 
-    protected $apiPustakaId;
+    protected $apiPustakaId = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/epustaka-borrow';
 
-    protected $apiSaveBook;
+    protected $baseHeaders = [
+        'Origin' => 'https://ipusnas2.perpusnas.go.id',
+        'Referer' => 'https://ipusnas2.perpusnas.go.id/',
+        'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
+    ];
 
-    protected $apiUpdateBookPath;
-
-    protected $apiUpdateBorrowedStatus;
-
-    protected $baseHeaders;
-
-    protected $tempDir;
-
-    protected $booksDir;
-
-    public function __construct($bookId = null)
+    public function __construct($accountId = null)
     {
-        $this->bookId = $bookId;
+        if (isset($accountId)) {
+            $this->getAccessToken($accountId);
+        }
+    }
 
-        $this->apiLogin = 'https://api2-ipusnas.perpusnas.go.id/api/auth/login';
-        $this->apiBookDetail = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-detail?book_id=';
-        $this->apiCheckBorrowBook = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/check-borrow-status?book_id=';
-        $this->apiReturnBook = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-return';
-        $this->apiBorrowBook = 'https://api2-ipusnas.perpusnas.go.id/agent/webhook/borrow';
-        $this->apiPustakaId = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/epustaka-borrow';
-
-        $this->baseHeaders = [
-            'Origin' => 'https://ipusnas2.perpusnas.go.id',
-            'Referer' => 'https://ipusnas2.perpusnas.go.id/',
-            'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
-        ];
-
-        $this->tempDir = storage_path('app/temp');
-        $this->booksDir = storage_path('app/books');
+    public function getAccessToken($accountId)
+    {
+        if (! Cache::has('ipusnas_token_'.$accountId)) {
+            $account = Account::find($accountId);
+            if ($account) {
+                $result = $this->login($account->email, $account->password);
+                if ($result['status'] === true && isset($result['data']['data']['access_token'])) {
+                    Cache::put('ipusnas_token_'.$accountId, $result['data']['data']['access_token'], 300);
+                }
+            }
+        }
 
     }
 
@@ -70,11 +65,7 @@ class IpusnasDownloader
                 'password' => $password,
             ]);
 
-        if ($response->failed()) {
-            return ['status' => false, 'data' => $response->json()];
-        }
-
-        return ['status' => true, 'data' => $response->json()];
+        return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
     /* ---------------------------
@@ -97,11 +88,7 @@ class IpusnasDownloader
 
         $response = Http::withHeaders($headers)->post($this->apiBorrowBook, $payload);
 
-        if ($response->failed()) {
-            return ['status' => false, 'data' => $response->body()];
-        }
-
-        return ['status' => true, 'data' => $response->json()];
+        return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
     /* ---------------------------
@@ -120,13 +107,7 @@ class IpusnasDownloader
                 'organization_id' => $organization_id,
             ]);
 
-        if ($response->failed()) {
-            return ['status' => false, 'data' => $response->body()];
-        }
-
-        $json = $response->json();
-
-        return ['status' => true, 'data' => $json['data']['id'] ?? null];
+        return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
     /* ---------------------------
@@ -141,11 +122,7 @@ class IpusnasDownloader
 
         $response = Http::withHeaders($headers)->get($this->apiBookDetail.$bookId);
 
-        if ($response->failed()) {
-            return ['status' => false, 'data' => $response->body()];
-        }
-
-        return ['status' => true, 'data' => $response->json()];
+        return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
     public function returnBook(string $token, $borrowBookId)
@@ -159,7 +136,7 @@ class IpusnasDownloader
         $response = Http::withHeaders($headers)
             ->put($this->apiReturnBook, ['borrow_book_id' => $borrowBookId]);
 
-        return ['status' => ! $response->failed(), 'data' => $response->body()];
+        return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
     public function getBorrowInfo(string $token, $bookId)
@@ -171,11 +148,7 @@ class IpusnasDownloader
 
         $response = Http::withHeaders($headers)->get($this->apiCheckBorrowBook.$bookId);
 
-        if ($response->failed()) {
-            return ['status' => false, 'data' => $response->body()];
-        }
-
-        return ['status' => true, 'data' => $response->json()];
+        return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
     /* ---------------------------

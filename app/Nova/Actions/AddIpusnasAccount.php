@@ -39,8 +39,6 @@ class AddIpusnasAccount extends Action
             $account->organization_id = $data['data']['organization_id'] ?? null;
             $account->verified = $data['data']['verified'] ?? false;
             $account->save();
-            Cache::put('access_token', $data['data']['access_token'], 3000);
-
             return Action::message('Akun IPusnas berhasil ditambahkan.');
         } else {
             return Action::danger($result['data']['error']['message']);
