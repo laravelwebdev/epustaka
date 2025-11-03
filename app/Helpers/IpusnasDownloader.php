@@ -215,8 +215,8 @@ class IpusnasDownloader
             $book->organization_id = optional($account)->organization_id;
             $book->borrow_key = optional($borrowInfo)['data']['borrow_key'];
             $book->book_url = optional($borrowInfo)['data']['url_file'];
-            $book->language = optional($bookDetail)['data']['language'];
-            $book->publisher = optional($bookDetail)['data']['publisher'];
+            $book->language = optional($bookDetail)['data']['catalog_info']['language_name'] ?? null;
+            $book->publisher = optional($bookDetail)['data']['catalog_info']['organization_group_name'] ?? null;
             $book->save();
         }
 
