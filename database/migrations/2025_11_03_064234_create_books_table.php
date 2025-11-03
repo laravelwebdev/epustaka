@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
-            $table->string('book_id')->unique();
+            $table->string('ipusnas_book_id')->unique();
             $table->string('book_title');
             $table->string('book_author')->nullable();
             $table->text('book_description')->nullable();
@@ -26,8 +26,8 @@ return new class extends Migration
             $table->string('epustaka_id')->nullable();
             $table->string('user_id')->nullable();
             $table->string('organization_id')->nullable();
-            $table->string('borrow_key')->nullable();
-            $table->string('book_url')->nullable();
+            $table->text('borrow_key')->nullable();
+            $table->text('book_url')->nullable();
             $table->string('language')->nullable();
             $table->string('publisher')->nullable();
             $table->string('path', 255)->nullable();

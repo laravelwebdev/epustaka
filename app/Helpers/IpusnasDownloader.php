@@ -200,7 +200,7 @@ class IpusnasDownloader
         }
         if (! isset($error)) {
             $book = new Book;
-            $book->book_id = $bookId;
+            $book->ipusnas_book_id = $bookId;
             $book->book_title = optional($bookDetail)['data']['book_title'];
             $book->book_author = optional($bookDetail)['data']['book_author'];
             $book->book_description = optional($bookDetail)['data']['book_description'];
