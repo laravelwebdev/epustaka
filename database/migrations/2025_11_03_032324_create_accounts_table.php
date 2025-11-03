@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('password', 40)->nullable();
             $table->string('ipusnas_id', 40)->nullable();
             $table->string('organization_id', 40)->nullable();
-            $table->string('access_token', 80)->nullable();
-            $table->string('refresh_token', 80)->nullable();
             $table->boolean('verified')->default(false);
             $table->mediumInteger('user_id')->unsigned()->nullable();
             $table->timestamps();
