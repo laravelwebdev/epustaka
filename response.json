@@ -1,0 +1,94 @@
+Book detail:
+{
+    "data": {
+        "id": "eda849ff-0ffd-4711-a096-ec12d4c064a0",
+        "book_author": "Adhy Asmara",
+        "avg_rating": 0,
+        "cover_url": "https://portal-storage.moco.co.id/mccp-public-images/static/cover/23aa9062d93bc416e204b90b3a7190b8.jpg",
+        "file_ext": "pdf",
+        "file_size_info": "6.5 MB",
+        "book_title": "Lima Sekawan",
+        "book_description": "<p>Lima sekawan menggambarkan anak-anak gelandangan di perkotaan yang berjuang agar bisa mencapai kehidupan lebih baik di masa depan.&nbsp;</p>\r\n",
+        "book_isbn": "978-623-340-417-4",
+        "book_eisbn": "978-623-340-417-4",
+        "using_drm": true,
+        "catalog_info": {
+            "book_type_name": "",
+            "category_name": "Fiksi",
+            "ddc_code": "",
+            "edition_name": "Revisi 1",
+            "education_class": "['SD/MI Kelas 1', 'SD/MI Kelas 2', 'SD/MI Kelas 3', 'SD/MI Kelas 4', 'SD/MI kelas 5', 'SD/MI kelas 6', 'Guru SD/MI']",
+            "language_name": "Indonesia",
+            "organization_group_id": "6d8002d5-7132-4fdf-b3d8-e648ccd3147e",
+            "organization_group_name": "CV TITIAN ILMU",
+            "organization_name": "ANGKASA CV",
+            "source_name": "Lokal",
+            "volume_name": ""
+        },
+        "publish_date": "2015",
+        "epublish_date": "2021",
+        "category_id": "dd51fa62-5302-11ea-b6cc-87ba0e195354",
+        "category_name": "Fiksi",
+        "all_qty": 10,
+        "available_qty": 10,
+        "active_borrow_count": 0,
+        "price": 22400,
+        "all_user_borrow_count": 24,
+        "queue_count": 0,
+        "citation_count": 0,
+        "citation_user_count": 0,
+        "user_rating": null,
+        "share_url": "https://ipusnas2.perpusnas.go.id/book/eda849ff-0ffd-4711-a096-ec12d4c064a0",
+
+    }
+}
+
+Epustaka
+{
+    "data": {
+        "id": "789493d9-4f7c-48d1-ad32-e2c120461f68",
+        "epustaka_name": "Popular",
+        "epustaka_logo": "https://static2-ipusnas.perpusnas.go.id/1fe99d3c-b272-40cd-8d9c-a4871f4eaef2/images/epustaka-logo/789493d9-4f7c-48d1-ad32-e2c120461f68.png",
+        "epustaka_catalog_id": "9ea53b69-4b51-4e11-b857-49f6bb0459a1",
+        "available_qty": 10,
+        "has_join": true,
+        "epustaka_isprivate": false,
+        "total_qty": 10,
+        "member_status": 1
+    }
+}
+
+Borrow:
+{
+    "code": "SUCCESS",
+    "message": "Berhasil meminjam buku",
+    "data": {
+        "borrow_start_date": "2025-11-04 04:54:34.937374",
+        "borrow_end_date": "2025-11-11 04:54:34.937374",
+        "user_id": "ddfe0889-bf59-40f0-8c67-795aea581da8",
+        "epustaka_id": "789493d9-4f7c-48d1-ad32-e2c120461f68",
+        "organization_id": "1fe99d3c-b272-40cd-8d9c-a4871f4eaef2",
+        "app_id": "789493d9-4f7c-48d1-ad32-e2c120461f68",
+        "catalog_id": "eda849ff-0ffd-4711-a096-ec12d4c064a0",
+        "created_by": "ddfe0889-bf59-40f0-8c67-795aea581da8",
+        "url_file": "https://static2-ipusnas.perpusnas.go.id/mdrm/application/pdf/pcp9yubmtyxe/eda849ff-0ffd-4711-a096-ec12d4c064a0.mdrm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=Psib8mzsg8j57Dn%2F20251103%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251103T215434Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=b9594e84b38045510a88ba2ca9fd9fe38c1ff7b2e5e2025637c04cd28dfd34b6",
+        "borrow_key": "58+oMp0pRnD+KYUMoSBMQD1g0mCwBr/qiwzaQ80fxW015F+cVCsSjIDTy823/0hJ6Vcrquf0vXTEyDti0IP7ig==",
+        "extension_type": "pdf"
+    }
+}
+
+Check Borrow
+{
+    "data": {
+        "id": "5bff198c-5fb2-44e2-9955-ce161116e9ab",
+        "url_file": "https://static2-ipusnas.perpusnas.go.id/mdrm/application/pdf/pcp9yubmtyxe/eda849ff-0ffd-4711-a096-ec12d4c064a0.mdrm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=Psib8mzsg8j57Dn%2F20251103%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251103T215434Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=b9594e84b38045510a88ba2ca9fd9fe38c1ff7b2e5e2025637c04cd28dfd34b6",
+        "borrow_key": "58+oMp0pRnD+KYUMoSBMQD1g0mCwBr/qiwzaQ80fxW015F+cVCsSjIDTy823/0hJ6Vcrquf0vXTEyDti0IP7ig==",
+        "has_borrow": true,
+        "has_borrow_before": true,
+        "epustaka": {
+            "epustaka_logo": "https://static2-ipusnas.perpusnas.go.id/1fe99d3c-b272-40cd-8d9c-a4871f4eaef2/images/epustaka-logo/789493d9-4f7c-48d1-ad32-e2c120461f68.png",
+            "epustaka_name": "Popular",
+            "id": "789493d9-4f7c-48d1-ad32-e2c120461f68"
+        }
+    }
+}

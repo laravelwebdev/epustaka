@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('failed_books', function (Blueprint $table) {
             $table->id();
             $table->string('book_id')->unique();
+            $table->boolean('failed_borrow')->default(false);
+            $table->boolean('failed_url')->default(false);
             $table->timestamps();
         });
     }

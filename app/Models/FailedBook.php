@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class FailedBook extends Model
 {
-    //
+    protected $fillable = [
+        'book_id',
+    ];
 }

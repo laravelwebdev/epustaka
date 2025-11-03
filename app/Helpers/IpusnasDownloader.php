@@ -3,26 +3,28 @@
 namespace App\Helpers;
 
 use App\Models\Account;
+use App\Models\Book;
+use App\Models\FailedBook;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class IpusnasDownloader
 {
-    protected $bookId;
+    private $accountId = null;
 
-    protected $apiLogin = 'https://api2-ipusnas.perpusnas.go.id/api/auth/login';
+    private $apiLogin = 'https://api2-ipusnas.perpusnas.go.id/api/auth/login';
 
-    protected $apiBookDetail = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-detail?book_id=';
+    private $apiBookDetail = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-detail?book_id=';
 
-    protected $apiCheckBorrowBook = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/check-borrow-status?book_id=';
+    private $apiCheckBorrowBook = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/check-borrow-status?book_id=';
 
-    protected $apiReturnBook = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-return';
+    private $apiReturnBook = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-return';
 
-    protected $apiBorrowBook = 'https://api2-ipusnas.perpusnas.go.id/agent/webhook/borrow';
+    private $apiBorrowBook = 'https://api2-ipusnas.perpusnas.go.id/agent/webhook/borrow';
 
-    protected $apiPustakaId = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/epustaka-borrow';
+    private $apiPustakaId = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/epustaka-borrow';
 
-    protected $baseHeaders = [
+    private $baseHeaders = [
         'Origin' => 'https://ipusnas2.perpusnas.go.id',
         'Referer' => 'https://ipusnas2.perpusnas.go.id/',
         'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
@@ -32,10 +34,11 @@ class IpusnasDownloader
     {
         if (isset($accountId)) {
             $this->getAccessToken($accountId);
+            $this->accountId = $accountId;
         }
     }
 
-    public function getAccessToken($accountId)
+    private function getAccessToken($accountId)
     {
         if (! Cache::has('ipusnas_token_'.$accountId)) {
             $account = Account::find($accountId);
@@ -71,7 +74,7 @@ class IpusnasDownloader
     /* ---------------------------
        Borrow
     ----------------------------*/
-    public function borrow(string $token, $user_id, $book_id, $organization_id, $epustaka_id)
+    private function borrow(string $token, $user_id, $book_id, $organization_id, $epustaka_id)
     {
         $payload = [
             'epustaka_id' => $epustaka_id,
@@ -94,7 +97,7 @@ class IpusnasDownloader
     /* ---------------------------
        Get Pustaka ID
     ----------------------------*/
-    public function getPustakaId(string $token, $book_id, $organization_id)
+    private function getPustakaId(string $token, $book_id, $organization_id)
     {
         $headers = array_merge($this->baseHeaders, [
             'Authorization' => 'Bearer '.$token,
@@ -113,7 +116,7 @@ class IpusnasDownloader
     /* ---------------------------
        Book detail / borrow info / return
     ----------------------------*/
-    public function getBookDetail(string $token, $bookId)
+    private function getBookDetail(string $token, $bookId)
     {
         $headers = array_merge($this->baseHeaders, [
             'Authorization' => 'Bearer '.$token,
@@ -125,7 +128,7 @@ class IpusnasDownloader
         return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
-    public function returnBook(string $token, $borrowBookId)
+    private function returnBook(string $token, $borrowBookId)
     {
         $headers = array_merge($this->baseHeaders, [
             'Authorization' => 'Bearer '.$token,
@@ -139,7 +142,7 @@ class IpusnasDownloader
         return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
-    public function getBorrowInfo(string $token, $bookId)
+    private function getBorrowInfo(string $token, $bookId)
     {
         $headers = array_merge($this->baseHeaders, [
             'Authorization' => 'Bearer '.$token,
@@ -152,16 +155,71 @@ class IpusnasDownloader
     }
 
     /* ---------------------------
-       Format bytes
+       Get Book
     ----------------------------*/
-    protected function formatBytes($bytes)
+    public function getBook($bookId)
     {
-        if ($bytes == 0) {
-            return '0 Bytes';
-        }
-        $sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        $i = (int) floor(log($bytes, 1024));
+        $error = null;
+        $bookDetail = null;
+        $epustaka = null;
+        $borrowInfo = null;
 
-        return number_format($bytes / pow(1024, $i), 2).' '.$sizes[$i];
+        // credential
+        $token = Cache::get('ipusnas_token_'.$this->accountId);
+        $account = Account::find($this->accountId);
+        // book detail
+        $bookDetailResponse = $this->getBookDetail($token, $bookId);
+        if ($bookDetailResponse['status'] === true) {
+            $bookDetail = $bookDetailResponse['data'];
+        } else {
+            $error = 'Failed to get book detail.';
+        }
+        // epustaka
+        $epustakaResponse = $this->getPustakaId($token, $bookId, optional($account)->organization_id);
+        if ($epustakaResponse['status'] === true) {
+            $epustaka = $epustakaResponse['data'];
+        } else {
+            $error = 'Failed to get epustaka id.';
+        }
+        // borrow
+        $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, optional($epustaka)['data']['id'] ?? null);
+        if ($borrowResponse['data']['code'] === 'SUCCESS') {
+            // borrow info
+            $borrowInfoResponse = $this->getBorrowInfo($token, $bookId);
+            if ($borrowInfoResponse['status'] === true) {
+                $borrowInfo = $borrowInfoResponse['data'];
+                $this->returnBook($token, optional($borrowInfo)['data']['borrow_book_id']);
+            } else {
+                $error = 'Failed to get borrow info.';
+            }
+        } else {
+            $error = 'Failed to borrow book.';
+            $failed = FailedBook::firstOrNew(['book_id' => $bookId]);
+            $failed->failed_borrow = true;
+            $failed->save();
+        }
+        if (! isset($error)) {
+            $book = new Book;
+            $book->book_id = $bookId;
+            $book->book_title = optional($bookDetail)['data']['book_title'];
+            $book->book_author = optional($bookDetail)['data']['book_author'];
+            $book->book_description = optional($bookDetail)['data']['book_description'];
+            $book->category_name = optional($bookDetail)['data']['category_name'];
+            $book->publish_date = optional($bookDetail)['data']['publish_date'];
+            $book->file_size_info = optional($bookDetail)['data']['file_size_info'];
+            $book->file_ext = optional($bookDetail)['data']['file_ext'];
+            $book->cover_url = optional($bookDetail)['data']['cover_url'];
+            $book->using_drm = optional($bookDetail)['data']['using_drm'];
+            $book->epustaka_id = optional($epustaka)['data']['id'];
+            $book->user_id = optional($account)->ipusnas_id;
+            $book->organization_id = optional($account)->organization_id;
+            $book->borrow_key = optional($borrowInfo)['data']['borrow_key'];
+            $book->book_url = optional($borrowInfo)['data']['url_file'];
+            $book->language = optional($bookDetail)['data']['language'];
+            $book->publisher = optional($bookDetail)['data']['publisher'];
+            $book->save();
+        }
+
+        return $error;
     }
 }

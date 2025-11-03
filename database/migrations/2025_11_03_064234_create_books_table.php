@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('file_ext', 10)->nullable();
             $table->string('cover_url')->nullable();
             $table->boolean('using_drm')->default(false);
-            $table->boolean('borrowed')->default(false);
             $table->string('epustaka_id')->nullable();
             $table->string('user_id')->nullable();
             $table->string('organization_id')->nullable();

@@ -2,6 +2,7 @@
 
 namespace App\Nova\Actions;
 
+use App\Helpers\IpusnasDownloader;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
@@ -24,8 +25,16 @@ class DownloadBook extends Action
      */
     public function handle(ActionFields $fields, Collection $models)
     {
-        //cek apakah sdh attach
-        //cek apakah buku sdh ada, jika ada langsung attach
+        // cek apakah sdh attach
+        // cek apakah buku sdh ada, jika ada langsung attach
+        $download = new IpusnasDownloader($fields->account_id);
+        // extract book id from the URL path safely
+        $path = parse_url($fields->ipusnas_link, PHP_URL_PATH);
+        $bookId = $path === null ? '' : basename($path);
+        $result = $download->getBook($bookId);
+        if ($result !== null) {
+            return Action::danger($result);
+        }
     }
 
     /**
