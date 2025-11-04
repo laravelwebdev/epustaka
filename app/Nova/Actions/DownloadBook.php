@@ -8,10 +8,12 @@ use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Actions\Action;
 use App\Helpers\IpusnasDownloader;
+use App\Models\Book;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\ActionFields;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\DB;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class DownloadBook extends Action
@@ -28,12 +30,32 @@ class DownloadBook extends Action
      */
     public function handle(ActionFields $fields, Collection $models)
     {
-        // cek apakah sdh attach
+        $user = Auth::user();
+        $path = parse_url($fields->ipusnas_link, PHP_URL_PATH);
+        $iPusnasBookId = $path === null ? '' : basename($path);
+        $book = Book::where('ipusnas_book_id', $iPusnasBookId)->first();
+        $book_id = optional($book)->id;
+        $user_id = $user->id;
+        $exist = DB::table('book_user')
+            ->where('book_id', $book_id)
+            ->where('user_id', $user_id)
+            ->exists();
+        if (optional($user)->points < 1) {
+            return Action::danger('Maaf, kamu tidak memiliki cukup Poin untuk mengunduh buku ini. Silakan top up Poin kamu terlebih dulu.');
+        }
+         // cek apakah buku sdh ada di koleksi user
+        if ($exist) {
+            return Action::message('Buku ini sudah pernah diunduh sebelumnya. Silakan Cek di koleksi buku kamu');
+        }
+        if ($book) {
+            // attach book to user
+            $book->users()->attach($user_id);
+            return Action::message('Buku ini sudah pernah diunduh sebelumnya. Buku telah ditambahkan ke koleksi kamu.');
+        }
         // cek apakah buku sdh ada, jika ada langsung attach
         $download = new IpusnasDownloader($fields->account_id);
         // extract book id from the URL path safely
-        $path = parse_url($fields->ipusnas_link, PHP_URL_PATH);
-        $bookId = $path === null ? '' : basename($path);
+
         $result = $download->getBook($bookId);
         if ($result !== null) {
             return Action::danger($result);
