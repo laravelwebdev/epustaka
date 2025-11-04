@@ -52,15 +52,15 @@ class DownloadBookFile implements ShouldQueue
 
             if ($this->book->using_drm) {
                 Log::info("⚠️ Book uses DRM, additional processing may be required: {$this->book->ipusnas_book_id}");
-                $decryptedKey = (new IpusnasDecryptor(Storage::disk('local')))->decryptKey(
+                $decryptedKey = (new IpusnasDecryptor(Storage::path('')))->decryptKey(
                     $this->book->user_id,
                     $this->book->ipusnas_book_id,
                     $this->book->epustaka_id,
                     $this->book->borrow_key
                 );
-                $passwordZip = (new IpusnasDecryptor(Storage::disk('local')))->generatePasswordZip($decryptedKey);
-                $extractedPath = (new IpusnasDecryptor(Storage::disk('local')))->extractZip(
-                    Storage::disk('local')->path($path),
+                $passwordZip = (new IpusnasDecryptor(Storage::path('')))->generatePasswordZip($decryptedKey);
+                $extractedPath = (new IpusnasDecryptor(Storage::path('')))->extractZip(
+                    Storage::path($path),
                     $passwordZip,
                     $this->book->ipusnas_book_id
                 );
