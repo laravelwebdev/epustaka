@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\AddPoint;
 use Illuminate\Http\Request;
 use Laravel\Nova\Auth\PasswordValidationRules;
 use Laravel\Nova\Fields\Gravatar;
@@ -103,6 +104,12 @@ class User extends Resource
      */
     public function actions(NovaRequest $request): array
     {
-        return [];
+        return [
+            AddPoint::make()
+                ->sole()
+                ->canSee(function (NovaRequest $request) {
+                    return $request->user()->can('runAction', $this->resource);
+                }),
+        ];
     }
 }
