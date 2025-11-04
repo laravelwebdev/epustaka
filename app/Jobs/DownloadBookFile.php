@@ -16,14 +16,11 @@ class DownloadBookFile implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $bookId;
+    protected $book;
 
-    protected $bookUrl;
-
-    public function __construct($bookId, $bookUrl)
+    public function __construct(Book $book)
     {
-        $this->bookId = $bookId;
-        $this->bookUrl = $bookUrl;
+        $this->book = $book;
     }
 
     public function handle(): void
@@ -35,8 +32,8 @@ class DownloadBookFile implements ShouldQueue
                 'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
                 'Content-Type' => 'application/vnd.api+json',
             ];
-            $url = $this->bookUrl;
-            $safeName = md5($this->bookId);
+            $url = $this->book->book_url;
+            $safeName = md5($this->book->ipusnas_book_id);
             $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'pdf';
             $filename = "{$safeName}.{$extension}";
             $path = "books/{$filename}";
@@ -47,13 +44,13 @@ class DownloadBookFile implements ShouldQueue
             if ($response->failed()) {
                 Log::warning("Failed to download: {$url}");
 
-                // return;
+                return;
             }
             // Simpan ke storage/app/public/books/
             Storage::put($path, $response->body());
 
             // Update path di database
-            Book::where('ipusnas_book_id', $this->bookId)->update(['path' => $path]);
+            Book::where('ipusnas_book_id', $this->book->ipusnas_book_id)->update(['path' => $path]);
 
             Log::info("✅ Downloaded and saved to storage: {$path}");
         } catch (\Exception $e) {

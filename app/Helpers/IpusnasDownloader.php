@@ -2,12 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Models\Book;
-use App\Models\Account;
-use App\Models\FailedBook;
 use App\Jobs\DownloadBookFile;
-use Illuminate\Support\Facades\Http;
+use App\Models\Account;
+use App\Models\Book;
+use App\Models\FailedBook;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class IpusnasDownloader
 {
@@ -219,7 +219,7 @@ class IpusnasDownloader
             $book->language = optional($bookDetail)['data']['catalog_info']['language_name'] ?? null;
             $book->publisher = optional($bookDetail)['data']['catalog_info']['organization_group_name'] ?? null;
             $book->save();
-            DownloadBookFile::dispatch($bookId,optional($borrowInfo)['data']['url_file']);
+            DownloadBookFile::dispatch($book);
         }
 
         return $error;
