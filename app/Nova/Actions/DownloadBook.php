@@ -2,18 +2,18 @@
 
 namespace App\Nova\Actions;
 
-use App\Models\Account;
-use Illuminate\Bus\Queueable;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Select;
-use Laravel\Nova\Actions\Action;
 use App\Helpers\IpusnasDownloader;
+use App\Models\Account;
 use App\Models\Book;
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Nova\Fields\ActionFields;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
+use Laravel\Nova\Actions\Action;
+use Laravel\Nova\Fields\ActionFields;
+use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class DownloadBook extends Action
@@ -41,15 +41,16 @@ class DownloadBook extends Action
             ->where('user_id', $user_id)
             ->exists();
         if (optional($user)->points < 1) {
-            return Action::danger('Maaf, kamu tidak memiliki cukup Poin untuk mengunduh buku ini. Silakan top up Poin kamu terlebih dulu.');
+            return Action::redirect(route('buypoin'));
         }
-         // cek apakah buku sdh ada di koleksi user
+        // cek apakah buku sdh ada di koleksi user
         if ($exist) {
             return Action::message('Buku ini sudah pernah diunduh sebelumnya. Silakan Cek di koleksi buku kamu');
         }
         if ($book) {
             $book->users()->attach($user_id);
-            return Action::message('Buku ini sudah pernah diunduh sebelumnya. Buku telah ditambahkan ke koleksi kamu.');
+
+            return Action::message(' Buku telah ditambahkan ke koleksi kamu.');
         }
         // // cek apakah buku sdh ada, jika ada langsung attach
         // $download = new IpusnasDownloader($fields->account_id);
@@ -60,7 +61,7 @@ class DownloadBook extends Action
         //     return Action::danger($result);
         // }
 
-        return Action::message('Download Success.');
+        return Action::message('Penambahan Buku sedang berlangsung. Cek notifikasi secara berkala.');
     }
 
     /**
