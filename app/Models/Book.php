@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Book extends Model
 {
+    protected $fillable = [
+        'path',
+    ];
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
