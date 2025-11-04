@@ -19,6 +19,8 @@ class AddIpusnasAccount extends Action
     use InteractsWithQueue;
     use Queueable;
 
+    public $withoutActionEvents = true;
+
     public $name = 'Hubungkan Akun iPusnas';
 
     /**
