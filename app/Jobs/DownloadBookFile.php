@@ -59,6 +59,7 @@ class DownloadBookFile implements ShouldQueue
                     $this->book->borrow_key
                 );
                 $passwordZip = (new IpusnasDecryptor(Storage::path('')))->generatePasswordZip($decryptedKey);
+                Log::error("Generated ZIP password for DRM book: {$passwordZip}");
                 $extractedPath = (new IpusnasDecryptor(Storage::path('')))->extractZip(
                     Storage::path($path),
                     $passwordZip,
