@@ -29,6 +29,12 @@ class DownloadBookFile implements ShouldQueue
     public function handle(): void
     {
         try {
+            $headers = [
+                'Origin' => 'https://ipusnas2.perpusnas.go.id',
+                'Referer' => 'https://ipusnas2.perpusnas.go.id/',
+                'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
+                'Content-Type' => 'application/vnd.api+json',
+            ];
             $url = $this->bookUrl;
             $safeName = md5($this->bookId);
             $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'pdf';
@@ -37,11 +43,11 @@ class DownloadBookFile implements ShouldQueue
 
             Log::info("Downloading book file: {$url}");
 
-            $response = Http::timeout(1200)->get($url);
+            $response = Http::withHeaders($headers)->timeout(1200)->get($url);
             if ($response->failed()) {
                 Log::warning("Failed to download: {$url}");
 
-                return;
+                // return;
             }
             // Simpan ke storage/app/public/books/
             Storage::put($path, $response->body());
