@@ -51,7 +51,7 @@ class DownloadBookFile implements ShouldQueue
             Storage::put($path, $response->body());
 
             if ($this->book->using_drm) {
-                Log::info("⚠️ Book uses DRM, additional processing may be required: {$this->book->ipusnas_book_id}");
+                Log::warning("⚠️ Book uses DRM, additional processing may be required: {$this->book->ipusnas_book_id}");
                 $decryptedKey = (new IpusnasDecryptor(Storage::path('')))->decryptKey(
                     $this->book->user_id,
                     $this->book->ipusnas_book_id,
@@ -65,8 +65,9 @@ class DownloadBookFile implements ShouldQueue
                     $this->book->ipusnas_book_id
                 );
                 Storage::move($extractedPath, "books/{$filename}");
+                $path = "books/{$filename}";
             } else {
-                Log::info("✅ Book downloaded without DRM: {$this->book->ipusnas_book_id}");
+                Log::warning("✅ Book downloaded without DRM: {$this->book->ipusnas_book_id}");
 
                 $finalPath = "books/{$filename}";
 
@@ -80,7 +81,7 @@ class DownloadBookFile implements ShouldQueue
                             Log::warning("Failed to move {$path} to {$finalPath}; keeping original path");
                         }
                     } catch (\Exception $e) {
-                        Log::error("Error moving file: ".$e->getMessage());
+                        Log::error('Error moving file: '.$e->getMessage());
                     }
                 } else {
                     Log::warning("Source file not found in temp: {$path}");
