@@ -50,42 +50,42 @@ class DownloadBookFile implements ShouldQueue
             // Simpan ke temporary storage
             Storage::put($path, $response->body());
 
-            if ($this->book->using_drm) {
-                Log::info("⚠️ Book uses DRM, additional processing may be required: {$this->book->ipusnas_book_id}");
-                $decryptedKey = (new IpusnasDecryptor(Storage::path()))->decryptKey(
-                    $this->book->user_id,
-                    $this->book->ipusnas_book_id,
-                    $this->book->epustaka_id,
-                    $this->book->borrow_key
-                );
-                $passwordZip = (new IpusnasDecryptor(Storage::path()))->generatePasswordZip($decryptedKey);
-                $extractedPath = (new IpusnasDecryptor(Storage::path()))->extractZip(
-                    Storage::path($path),
-                    $passwordZip,
-                    $this->book->ipusnas_book_id
-                );
-                Storage::move($extractedPath, "books/{$filename}");
-            } else {
-                Log::info("✅ Book downloaded without DRM: {$this->book->ipusnas_book_id}");
+            // if ($this->book->using_drm) {
+            //     Log::info("⚠️ Book uses DRM, additional processing may be required: {$this->book->ipusnas_book_id}");
+            //     $decryptedKey = (new IpusnasDecryptor(Storage::path('/')))->decryptKey(
+            //         $this->book->user_id,
+            //         $this->book->ipusnas_book_id,
+            //         $this->book->epustaka_id,
+            //         $this->book->borrow_key
+            //     );
+            //     $passwordZip = (new IpusnasDecryptor(Storage::path('/')))->generatePasswordZip($decryptedKey);
+            //     $extractedPath = (new IpusnasDecryptor(Storage::path('/')))->extractZip(
+            //         Storage::path($path),
+            //         $passwordZip,
+            //         $this->book->ipusnas_book_id
+            //     );
+            //     Storage::move($extractedPath, "books/{$filename}");
+            // } else {
+            //     Log::info("✅ Book downloaded without DRM: {$this->book->ipusnas_book_id}");
 
-                $finalPath = "books/{$filename}";
+            //     $finalPath = "books/{$filename}";
 
-                if (Storage::exists($path)) {
-                    try {
-                        if (Storage::move($path, $finalPath)) {
-                            Log::info("Moved file from {$path} to {$finalPath}");
-                            // update $path so DB stores the final location
-                            $path = $finalPath;
-                        } else {
-                            Log::warning("Failed to move {$path} to {$finalPath}; keeping original path");
-                        }
-                    } catch (\Exception $e) {
-                        Log::error("Error moving file: ".$e->getMessage());
-                    }
-                } else {
-                    Log::warning("Source file not found in temp: {$path}");
-                }
-            }
+            //     if (Storage::exists($path)) {
+            //         try {
+            //             if (Storage::move($path, $finalPath)) {
+            //                 Log::info("Moved file from {$path} to {$finalPath}");
+            //                 // update $path so DB stores the final location
+            //                 $path = $finalPath;
+            //             } else {
+            //                 Log::warning("Failed to move {$path} to {$finalPath}; keeping original path");
+            //             }
+            //         } catch (\Exception $e) {
+            //             Log::error("Error moving file: ".$e->getMessage());
+            //         }
+            //     } else {
+            //         Log::warning("Source file not found in temp: {$path}");
+            //     }
+            // }
 
             // Update path di database
             Book::where('ipusnas_book_id', $this->book->ipusnas_book_id)->update(['path' => $path]);
