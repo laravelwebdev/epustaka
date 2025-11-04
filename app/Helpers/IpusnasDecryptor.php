@@ -9,12 +9,9 @@ class IpusnasDecryptor
 {
     protected $tempDir;
 
-    public function __construct()
+    public function __construct($tempDir)
     {
-        $this->tempDir = storage_path('app/ipusnas_temp');
-        if (! file_exists($this->tempDir)) {
-            @mkdir($this->tempDir, 0777, true);
-        }
+        $this->tempDir = $tempDir;
     }
 
     /* ---------------------------
@@ -78,8 +75,9 @@ class IpusnasDecryptor
     /* ---------------------------
        4. Ekstraksi ZIP / MOCO
     ----------------------------*/
-    public function extractZip(string $inputPath, string $passwordZip, $bookId)
+    public function extractZip(string $inputPath, string $passwordZip, $ipusnasBookId)
     {
+        $bookId = md5($ipusnasBookId);
         try {
             $zip = new ZipArchive;
             if ($zip->open($inputPath) !== true) {
