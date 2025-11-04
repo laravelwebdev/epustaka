@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Helpers\IpusnasDecryptor;
+use App\Helpers\ZipExtractor;
 use App\Models\Book;
-use App\Services\ZipExtractor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

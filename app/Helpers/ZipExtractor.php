@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Helpers;
 
 use ZipArchive;
 
@@ -11,17 +11,19 @@ class ZipExtractor
      * - Jika berisi .moco → PDF (streaming)
      * - Jika tidak → EPUB
      *
-     * @param string $path      Path file .mdrm
-     * @param string $password  Password zip
-     * @return string|null      Path file hasil (.pdf atau .epub)
+     * @param  string  $path  Path file .mdrm
+     * @param  string  $password  Password zip
+     * @return string|null Path file hasil (.pdf atau .epub)
      */
     public function extract(string $path, string $password): ?string
     {
-        if (!is_file($path)) return null;
+        if (! is_file($path)) {
+            return null;
+        }
 
         $baseName = pathinfo($path, PATHINFO_FILENAME);
-        $tempRoot = storage_path('app/private/temp');         
-        $workDir = $tempRoot . '/' . $baseName;       
+        $tempRoot = storage_path('app/private/temp');
+        $workDir = $tempRoot.'/'.$baseName;
         $destDir = storage_path('app/private/books');
 
         // pastikan folder kerja bersih
@@ -29,20 +31,23 @@ class ZipExtractor
         @mkdir($workDir, 0755, true);
 
         $zip = new ZipArchive;
-        if ($zip->open($path) !== true) return null;
+        if ($zip->open($path) !== true) {
+            return null;
+        }
         $zip->setPassword($password);
 
         // Kasus .moco (hanya satu file di zip)
         if ($zip->numFiles === 1 && strcasecmp(pathinfo($zip->getNameIndex(0), PATHINFO_EXTENSION), 'moco') === 0) {
             $mocoName = $zip->getNameIndex(0);
-            $pdfPath = $destDir . '/' . $baseName . '.pdf';
+            $pdfPath = $destDir.'/'.$baseName.'.pdf';
 
             // Ekstrak langsung ke file PDF (streaming, aman untuk file besar)
             $zip->extractTo($destDir, [$mocoName]);
-            @rename($destDir . '/' . $mocoName, $pdfPath);
+            @rename($destDir.'/'.$mocoName, $pdfPath);
 
             $zip->close();
             @unlink($path);
+
             return $pdfPath;
         }
 
@@ -50,7 +55,7 @@ class ZipExtractor
         $zip->extractTo($workDir);
         $zip->close();
 
-        $epubPath = $destDir . '/' . $baseName . '.epub';
+        $epubPath = $destDir.'/'.$baseName.'.epub';
         $this->makeZip($workDir, $epubPath);
 
         $this->deleteDir($workDir);
@@ -62,7 +67,9 @@ class ZipExtractor
     /** Hapus folder rekursif */
     protected function deleteDir(string $dir): void
     {
-        if (!is_dir($dir)) return;
+        if (! is_dir($dir)) {
+            return;
+        }
 
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
@@ -80,7 +87,9 @@ class ZipExtractor
     protected function makeZip(string $dir, string $zipPath): void
     {
         $zip = new ZipArchive;
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) return;
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            return;
+        }
 
         $rootLen = strlen($dir) + 1;
 
