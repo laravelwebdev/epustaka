@@ -76,36 +76,7 @@ class IpusnasDecryptor
     }
 
     /* ---------------------------
-       4. Dekripsi PDF (pakai qpdf)
-    ----------------------------*/
-    public function decryptPDF(string $inputPath, string $password, string $outputPath)
-    {
-        try {
-            $cmd = sprintf(
-                'qpdf --password=%s --decrypt %s %s',
-                escapeshellarg($password),
-                escapeshellarg($inputPath),
-                escapeshellarg($outputPath)
-            );
-
-            exec($cmd, $out, $rc);
-            if ($rc === 0) {
-                @unlink($inputPath);
-
-                return $outputPath;
-            } else {
-                // jika gagal, tetap simpan file terenkripsi
-                rename($inputPath, $outputPath);
-
-                return "Failed decrypt, PDF password: {$password}";
-            }
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    /* ---------------------------
-       5. Ekstraksi ZIP / MOCO
+       4. Ekstraksi ZIP / MOCO
     ----------------------------*/
     public function extractZip(string $inputPath, string $passwordZip, $bookId)
     {

@@ -35,6 +35,8 @@ class DownloadBook extends Action
         if ($result !== null) {
             return Action::danger($result);
         }
+
+        return Action::message('Download Success.');
     }
 
     /**

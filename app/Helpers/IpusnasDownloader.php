@@ -188,10 +188,10 @@ class IpusnasDownloader
             $borrowInfoResponse = $this->getBorrowInfo($token, $bookId);
             if ($borrowInfoResponse['status'] === true) {
                 $borrowInfo = $borrowInfoResponse['data'];
-                $this->returnBook($token, optional($borrowInfo)['data']['id']);
             } else {
                 $error = 'Failed to get borrow info.';
             }
+            $this->returnBook($token, optional($borrowInfo)['data']['id']);
         } else {
             $error = 'Failed to borrow book.';
             $failed = FailedBook::firstOrNew(['book_id' => $bookId]);

@@ -3,6 +3,8 @@
 namespace App\Nova;
 
 use App\Nova\Actions\DownloadBook;
+use Laravel\Nova\Fields\Image;
+use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Book extends Resource
@@ -39,7 +41,8 @@ class Book extends Resource
     public static $search = [
         'book_title',
         'book_author',
-        'book_description',
+        'category_name',
+        'publisher',
     ];
 
     /**
@@ -50,7 +53,29 @@ class Book extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-
+            Image::make('Cover Buku')
+                ->preview(fn () => $this->cover_url)
+                ->indexWidth(80)
+                ->detailWidth(80)
+                ->exceptOnForms(),
+            Text::make('Title', 'book_title')
+                ->sortable()
+                ->exceptOnForms(),
+            Text::make('Author', 'book_author')
+                ->sortable()
+                ->exceptOnForms(),
+            Text::make('Category', 'category_name')
+                ->sortable()
+                ->exceptOnForms(),
+            Text::make('Publisher', 'publisher')
+                ->sortable()
+                ->exceptOnForms(),
+            Text::make('Published date', 'publish_date')
+                ->sortable()
+                ->exceptOnForms(),
+            Text::make('Description', 'book_description')
+                ->asHtml()
+                ->onlyOnDetail(),
         ];
     }
 
@@ -93,6 +118,7 @@ class Book extends Resource
     {
         return [
             DownloadBook::make()->standalone()
+                ->confirmText('Unduh buku dari iPusnas?')
                 ->size('7xl'),
         ];
     }

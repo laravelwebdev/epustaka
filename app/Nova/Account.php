@@ -2,10 +2,10 @@
 
 namespace App\Nova;
 
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Boolean;
 use App\Nova\Actions\AddIpusnasAccount;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Account extends Resource
@@ -101,7 +101,10 @@ class Account extends Resource
     public function actions(NovaRequest $request)
     {
         return [
-            AddIpusnasAccount::make()->standalone(),
+            AddIpusnasAccount::make()
+                ->standalone()
+                ->confirmText('Hubungkan Akun iPusnas kamu dengan Epustaka?')
+                ->confirmButtonText('Hubungkan Akun'),
         ];
     }
 

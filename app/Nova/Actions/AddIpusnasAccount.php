@@ -19,6 +19,8 @@ class AddIpusnasAccount extends Action
     use InteractsWithQueue;
     use Queueable;
 
+    public $name = 'Hubungkan Akun iPusnas';
+
     /**
      * Perform the action on the given models.
      *
@@ -54,8 +56,10 @@ class AddIpusnasAccount extends Action
     {
         return [
             Email::make('Email', 'email')
+                ->help('Masukkan email akun iPusnas kamu')
                 ->rules('required', 'email', 'max:255'),
             Text::make('Password', 'password')
+                ->help('Masukkan password akun iPusnas kamu')
                 ->rules('required', 'string', 'max:255'),
         ];
     }
