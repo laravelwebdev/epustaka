@@ -20,24 +20,31 @@ class IpusnasDecryptor
     public function decryptKey($userId, $bookId, $epustakaId, $borrowKey)
     {
         try {
+            // Gabungkan ID seperti di Node.js
             $formatted = $userId.$bookId.$epustakaId;
-            $shaBin = hash('sha256', $formatted, true);
-            $key = substr($shaBin, 7, 16);
 
+            // Hash SHA256 → ambil HEX → slice(7,23)
+            $shaHex = hash('sha256', $formatted); // hasil hex (64 karakter)
+            $key = substr($shaHex, 7, 16); // ambil 16 karakter mulai dari index 7
+
+            // Decode base64
             $decoded = base64_decode($borrowKey);
             if ($decoded === false) {
-                return 'Invalid base64 borrowKey';
+                throw new Exception('Invalid base64 borrowKey');
             }
 
+            // Pisahkan IV dan ciphertext
             $iv = substr($decoded, 0, 16);
             $ciphertext = substr($decoded, 16);
 
+            // Dekripsi AES-128-CBC
             $decrypted = openssl_decrypt($ciphertext, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv);
             if ($decrypted === false) {
-                return 'Decryption failed';
+                throw new Exception('Decryption failed');
             }
 
             return $decrypted;
+
         } catch (Exception $e) {
             return $e->getMessage();
         }
