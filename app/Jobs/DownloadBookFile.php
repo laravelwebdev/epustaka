@@ -46,6 +46,9 @@ class DownloadBookFile implements ShouldQueue
                 $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $this->book->ipusnas_book_id]);
                 $failed->failed_url = true;
                 $failed->save();
+                Book::where('ipusnas_book_id', $this->book->ipusnas_book_id)->delete();
+
+                return;
             }
             // Simpan ke temporary storage
             Storage::put($path, $response->body());
