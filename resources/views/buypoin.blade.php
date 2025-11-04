@@ -111,7 +111,7 @@ body {
     <h3 class="price">Rp.1k<span>/poin</span></h3>
     <p class="description">Untuk pemeliharaan website dan sewa hosting agar layanan tetap bisa diakses, penggunaan layanan membutuhkan poin.</p>
     <b class="offer">Dapatkan Segera <br> di</b>
-    <a class="subscribe-button" href="#">Shopee</a>
+    <a class="subscribe-button" href="{{ config('app.shopee') }}">Shopee</a>
     <div class="ribbon-wrap">
       <div class="ribbon">New</div>
     </div>

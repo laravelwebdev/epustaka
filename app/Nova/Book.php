@@ -16,6 +16,8 @@ class Book extends Resource
      */
     public static $model = \App\Models\Book::class;
 
+    public static $with = ['users'];
+
     public static function label()
     {
         return 'Unduh Buku';

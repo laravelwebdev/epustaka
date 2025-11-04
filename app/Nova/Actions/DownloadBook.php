@@ -48,18 +48,17 @@ class DownloadBook extends Action
             return Action::message('Buku ini sudah pernah diunduh sebelumnya. Silakan Cek di koleksi buku kamu');
         }
         if ($book) {
-            // attach book to user
             $book->users()->attach($user_id);
             return Action::message('Buku ini sudah pernah diunduh sebelumnya. Buku telah ditambahkan ke koleksi kamu.');
         }
-        // cek apakah buku sdh ada, jika ada langsung attach
-        $download = new IpusnasDownloader($fields->account_id);
-        // extract book id from the URL path safely
+        // // cek apakah buku sdh ada, jika ada langsung attach
+        // $download = new IpusnasDownloader($fields->account_id);
+        // // extract book id from the URL path safely
 
-        $result = $download->getBook($bookId);
-        if ($result !== null) {
-            return Action::danger($result);
-        }
+        // $result = $download->getBook($bookId);
+        // if ($result !== null) {
+        //     return Action::danger($result);
+        // }
 
         return Action::message('Download Success.');
     }
