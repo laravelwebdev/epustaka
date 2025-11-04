@@ -15,7 +15,7 @@ class ZipExtractor
      * @param  string  $password  Password zip
      * @return string|null Path file hasil (.pdf atau .epub)
      */
-    public function extract(string $path, string $password): ?string
+    public function extract(string $path, string $password = ''): ?string
     {
         if (! is_file($path)) {
             return null;
@@ -26,7 +26,18 @@ class ZipExtractor
         $workDir = $tempRoot.'/'.$baseName;
         $destDir = storage_path('app/private/books');
 
-        // pastikan folder kerja bersih
+        if (empty($password)) {
+            $newPath = $destDir.'/'.basename($path);
+            if (! @rename($path, $newPath)) {
+                if (! @copy($path, $newPath)) {
+                    return null;
+                }
+                @unlink($path);
+            }
+
+            return $this->relativeStoragePath($newPath);
+        }
+
         $this->deleteDir($workDir);
         @mkdir($workDir, 0755, true);
 
@@ -46,9 +57,10 @@ class ZipExtractor
             @rename($destDir.'/'.$mocoName, $pdfPath);
 
             $zip->close();
+            $this->deleteDir($workDir);
             @unlink($path);
 
-            return $pdfPath;
+            return $this->relativeStoragePath($pdfPath);
         }
 
         // ZIP berisi banyak file → ekstrak ke folder temp
@@ -61,7 +73,7 @@ class ZipExtractor
         $this->deleteDir($workDir);
         @unlink($path);
 
-        return $epubPath;
+        return $this->relativeStoragePath($epubPath);
     }
 
     /** Hapus folder rekursif */
@@ -105,5 +117,12 @@ class ZipExtractor
         }
 
         $zip->close();
+    }
+
+    protected function relativeStoragePath(string $fullPath): string
+    {
+        $storagePath = realpath(storage_path('app/private')) ?: storage_path('app/private');
+
+        return ltrim(str_replace($storagePath, '', $fullPath), DIRECTORY_SEPARATOR);
     }
 }

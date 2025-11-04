@@ -2,15 +2,16 @@
 
 namespace App\Nova\Actions;
 
-use App\Helpers\IpusnasDownloader;
+use App\Models\Account;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Actions\Action;
+use App\Helpers\IpusnasDownloader;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Fields\ActionFields;
-use Laravel\Nova\Fields\Select;
-use Laravel\Nova\Fields\Text;
+use Illuminate\Queue\InteractsWithQueue;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class DownloadBook extends Action
@@ -54,7 +55,7 @@ class DownloadBook extends Action
                 ->help('Contoh: https://ipusnas2.perpusnas.go.id/book/5af9ac34-122a-41a4-9c2f-66dd2d065f27'),
             Select::make('Akun iPusnas', 'account_id')
                 ->options(function () {
-                    return \App\Models\Account::where('user_id', Auth::user()->id)->pluck('email', 'id')->toArray();
+                    return Account::where('user_id', Auth::user()->id)->pluck('email', 'id')->toArray();
                 })
                 ->rules('required')
                 ->searchable()

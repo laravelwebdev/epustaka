@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Helpers\IpusnasDecryptor;
 use App\Helpers\ZipExtractor;
 use App\Models\Book;
+use App\Models\FailedBook;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -40,46 +41,29 @@ class DownloadBookFile implements ShouldQueue
             $filename = "{$safeName}.{$extension}";
             $path = "temp/{$filename}";
 
-            Log::info("Downloading book file: {$url}");
-
             $response = Http::withHeaders($headers)->timeout(1200)->get($url);
             if ($response->failed()) {
-                Log::warning("Failed to download: {$url}");
-
-                return;
+                $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $this->book->ipusnas_book_id]);
+                $failed->failed_url = true;
+                $failed->save();
             }
             // Simpan ke temporary storage
             Storage::put($path, $response->body());
 
             if ($this->book->using_drm) {
                 $passwordZip = IpusnasDecryptor::generatePasswordZip(
-                    $this->book->user_id,
+                    $this->book->ipusnas_user_id,
                     $this->book->ipusnas_book_id,
                     $this->book->epustaka_id,
                     $this->book->borrow_key
                 );
-                $extractedPath = (new ZipExtractor)->extract(storage_path('app/private/'.$path), $passwordZip);
-                $path = $extractedPath;
-            } else {
-                $finalPath = "books/{$filename}";
-                if (Storage::exists($path)) {
-                    try {
-                        if (Storage::move($path, $finalPath)) {
-                            Log::info("Moved file from {$path} to {$finalPath}");
-                            $path = $finalPath;
-                        } else {
-                            Log::warning("Failed to move {$path} to {$finalPath}; keeping original path");
-                        }
-                    } catch (\Exception $e) {
-                        Log::error('Error moving file: '.$e->getMessage());
-                    }
-                } else {
-                    Log::warning("Source file not found in temp: {$path}");
-                }
-            }
-            Book::where('ipusnas_book_id', $this->book->ipusnas_book_id)->update(['path' => $path]);
 
-            Log::info("✅ Downloaded and saved to storage: {$path}");
+            } else {
+                $passwordZip = '';
+            }
+            $extractedPath = (new ZipExtractor)->extract(storage_path('app/private/'.$path), $passwordZip);
+            Book::where('ipusnas_book_id', $this->book->ipusnas_book_id)->update(['path' => $extractedPath]);
+            FailedBook::where('ipusnas_book_id', $this->book->ipusnas_book_id)->delete();
         } catch (\Exception $e) {
             Log::error('DownloadBookFile error: '.$e->getMessage());
         }

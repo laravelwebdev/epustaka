@@ -195,7 +195,7 @@ class IpusnasDownloader
             $this->returnBook($token, optional($borrowInfo)['data']['id']);
         } else {
             $error = 'Failed to borrow book.';
-            $failed = FailedBook::firstOrNew(['book_id' => $bookId]);
+            $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $bookId]);
             $failed->failed_borrow = true;
             $failed->save();
         }
@@ -212,7 +212,7 @@ class IpusnasDownloader
             $book->cover_url = optional($bookDetail)['data']['cover_url'];
             $book->using_drm = optional($bookDetail)['data']['using_drm'];
             $book->epustaka_id = optional($epustaka)['data']['id'];
-            $book->user_id = optional($account)->ipusnas_id;
+            $book->ipusnas_user_id = optional($account)->ipusnas_id;
             $book->organization_id = optional($account)->organization_id;
             $book->borrow_key = optional($borrowInfo)['data']['borrow_key'];
             $book->book_url = optional($borrowInfo)['data']['url_file'];

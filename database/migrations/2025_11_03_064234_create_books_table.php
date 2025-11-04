@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('cover_url')->nullable();
             $table->boolean('using_drm')->default(false);
             $table->string('epustaka_id')->nullable();
-            $table->string('user_id')->nullable();
+            $table->string('ipusnas_user_id')->nullable();
             $table->string('organization_id')->nullable();
             $table->text('borrow_key')->nullable();
             $table->text('book_url')->nullable();
