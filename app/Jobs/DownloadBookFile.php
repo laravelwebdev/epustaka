@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Helpers\IpusnasDecryptor;
 use App\Models\Book;
+use App\Services\ZipExtractor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -51,33 +52,20 @@ class DownloadBookFile implements ShouldQueue
             Storage::put($path, $response->body());
 
             if ($this->book->using_drm) {
-                Log::warning("⚠️ Book uses DRM, additional processing may be required: {$this->book->ipusnas_book_id}");
-                $decryptedKey = (new IpusnasDecryptor(Storage::path('')))->decryptKey(
+                $passwordZip = IpusnasDecryptor::generatePasswordZip(
                     $this->book->user_id,
                     $this->book->ipusnas_book_id,
                     $this->book->epustaka_id,
                     $this->book->borrow_key
                 );
-                Log::error("Decrypted key for DRM book: {$decryptedKey}");
-                $passwordZip = (new IpusnasDecryptor(Storage::path('')))->generatePasswordZip($decryptedKey);
-                Log::error("Generated ZIP password for DRM book: {$passwordZip}");
-                $extractedPath = (new IpusnasDecryptor(Storage::path('')))->extractZip(
-                    Storage::path($path),
-                    $passwordZip,
-                    $this->book->ipusnas_book_id
-                );
-                Storage::move($extractedPath, "books/{$filename}");
-                $path = "books/{$filename}";
+                $extractedPath = (new ZipExtractor)->extract(storage_path('app/private/'.$path), $passwordZip);
+                $path = $extractedPath;
             } else {
-                Log::warning("✅ Book downloaded without DRM: {$this->book->ipusnas_book_id}");
-
                 $finalPath = "books/{$filename}";
-
                 if (Storage::exists($path)) {
                     try {
                         if (Storage::move($path, $finalPath)) {
                             Log::info("Moved file from {$path} to {$finalPath}");
-                            // update $path so DB stores the final location
                             $path = $finalPath;
                         } else {
                             Log::warning("Failed to move {$path} to {$finalPath}; keeping original path");
@@ -89,8 +77,6 @@ class DownloadBookFile implements ShouldQueue
                     Log::warning("Source file not found in temp: {$path}");
                 }
             }
-
-            // Update path di database
             Book::where('ipusnas_book_id', $this->book->ipusnas_book_id)->update(['path' => $path]);
 
             Log::info("✅ Downloaded and saved to storage: {$path}");
