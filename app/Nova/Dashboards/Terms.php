@@ -15,7 +15,7 @@ class Terms extends Dashboard
     public function cards(): array
     {
         return [
-            new CardsTerms,
+            CardsTerms::make()->width('full'),
         ];
     }
 }
