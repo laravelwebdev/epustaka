@@ -7,7 +7,7 @@ use Laravel\Nova\Dashboard;
 
 class Main extends Dashboard
 {
-    public static $name = 'Terms';
+    public $name = 'Terms';
 
     /**
      * Get the cards for the dashboard.
