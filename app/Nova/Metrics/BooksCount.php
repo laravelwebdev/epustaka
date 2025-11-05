@@ -3,10 +3,10 @@
 namespace App\Nova\Metrics;
 
 use DateTimeInterface;
-use Laravel\Nova\Metrics\Value;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Nova\Metrics\ValueResult;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Metrics\Value;
+use Laravel\Nova\Metrics\ValueResult;
 
 class BooksCount extends Value
 {
@@ -16,7 +16,7 @@ class BooksCount extends Value
     public function calculate(NovaRequest $request): ValueResult
     {
         return $this->result(Auth::user()->books()->count())
-            ->suffix('Buku');
+            ->suffix('Book');
     }
 
     /**
