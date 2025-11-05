@@ -26,9 +26,14 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
             return [
                 MenuSection::dashboard(Main::class)->icon('exclamation-triangle'),
                 MenuSection::resource(\App\Nova\User::class)->icon('users'),
-                MenuSection::resource(\App\Nova\Account::class)->icon('key'),
-                MenuSection::resource(\App\Nova\Book::class)->icon('book-open'),
-                MenuItem::externalLink('Kontak Support', 'https://wa.me/6287716206091'),
+                MenuSection::make('iPusnas', [
+                    MenuItem::resource(\App\Nova\Account::class),
+                    MenuItem::resource(\App\Nova\Book::class),
+                ])->icon('book-open'),
+                MenuSection::make('Help', [
+                    MenuItem::externalLink('Kontak Support', 'https://wa.me/6287716206091'),
+                ])->icon('question-mark-circle'),
+
             ];
         });
 
