@@ -3,13 +3,12 @@
 namespace App\Nova;
 
 use App\Nova\Actions\DownloadBook;
+use App\Nova\Actions\DownloadPdf;
 use App\Nova\Metrics\BooksCount;
 use App\Nova\Metrics\Points;
-use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Fields\Image;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Nova;
 
 class Book extends Resource
 {
@@ -139,9 +138,10 @@ class Book extends Resource
     {
         return [
             DownloadBook::make()->standalone()
-                ->confirmText('Unduh buku dari iPusnas?')
+                ->confirmText('Pinjam buku dari iPusnas?')
                 ->size('7xl'),
-            Action::visit('Download', Nova::url('/api/books/download/'.$this->id))->sole(),
+            DownloadPdf::make()->sole()
+                ->confirmText('Unduh Buku?'),
         ];
     }
 }
