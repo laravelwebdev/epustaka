@@ -39,6 +39,10 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
             ];
         });
 
+        Nova::footer(function (Request $request) {
+            return 'Made with ♥ by Epustaka Digital Indonesia';
+        });
+
         Nova::serving(function () {
             Route::post('/nova/logout', function () {
                 auth()->logout();
