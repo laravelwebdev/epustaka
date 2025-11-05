@@ -9,6 +9,7 @@ use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Notifications\NovaNotification;
 
 class AddPoint extends Action
 {
@@ -25,6 +26,12 @@ class AddPoint extends Action
         $model = $models->first();
         $model->points += $fields->points;
         $model->save();
+        $model->notify(
+            NovaNotification::make()
+                ->message('Poin Anda Telah ditambahkan sebesar '.$fields->points.'. Terima Kasih!')
+                ->icon('currency-dollar')
+                ->type('info')
+        );
     }
 
     /**
