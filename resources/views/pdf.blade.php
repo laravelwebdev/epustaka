@@ -142,7 +142,7 @@
             qpdf.execute([
               '--decrypt',
               '--password=' + password,
-              '--stream-data=copy',   // ✅ PERTAHANKAN STREAM ASLI TANPA RECOMPRESS
+              '--stream-data=preserve',   // ✅ PERTAHANKAN STREAM ASLI TANPA RECOMPRESS
               '--',
               'input.pdf',
               'output.pdf'
