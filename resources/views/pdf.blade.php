@@ -92,6 +92,7 @@
         progressContainer.style.display = 'none';
 
         // PAKAI PERSIS callback-style API dari dokumentasi
+        QPDF.path = '{{ asset('js') }}/'; 
         QPDF({
           ready: function (qpdf) {
             try {
