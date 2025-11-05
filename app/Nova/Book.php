@@ -2,13 +2,14 @@
 
 namespace App\Nova;
 
-use App\Nova\Actions\DownloadBook;
-use App\Nova\Metrics\Points;
-use Laravel\Nova\Actions\Action;
-use Laravel\Nova\Fields\Image;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
+use App\Nova\Metrics\Points;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Image;
+use App\Nova\Metrics\BooksCount;
+use Laravel\Nova\Actions\Action;
+use App\Nova\Actions\DownloadBook;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Book extends Resource
 {
@@ -99,6 +100,9 @@ class Book extends Resource
     {
         return [
             Points::make()
+                ->width('1/2')
+                ->refreshWhenActionsRun(),
+            BooksCount::make()
                 ->width('1/2')
                 ->refreshWhenActionsRun(),
         ];
