@@ -2,8 +2,8 @@
 
 namespace App\Nova\Dashboards;
 
-use App\Nova\Metrics\Terms as CardsTerms;
-use Laravel\Nova\Dashboards\Main as Dashboard;
+use App\Nova\Metrics\Terms;
+use Laravel\Nova\Dashboard;
 
 class Main extends Dashboard
 {
@@ -17,7 +17,7 @@ class Main extends Dashboard
     public function cards(): array
     {
         return [
-            CardsTerms::make()->width('full'),
+            Terms::make()->width('full'),
         ];
     }
 }
