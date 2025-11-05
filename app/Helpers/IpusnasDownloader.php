@@ -236,7 +236,7 @@ class IpusnasDownloader
             }
             $this->returnBook($token, optional($borrowInfo)['data']['id']);
         } else {
-            $error = 'Failed to borrow book.';
+            $error = 'Gagal Meminjam Buku';
             $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $bookId]);
             $failed->failed_borrow = true;
             $failed->save();
@@ -256,13 +256,14 @@ class IpusnasDownloader
             $book->epustaka_id = optional($epustaka)['data']['id'];
             $book->ipusnas_user_id = optional($account)->ipusnas_id;
             $book->organization_id = optional($account)->organization_id;
-            $book->borrow_key = optional($borrowInfo)['data']['borrow_key'];
+            $borrow_key = (optional($bookDetail)['data']['using_drm'] == true) ? optional($borrowInfo)['data']['borrow_key'] : null;
+            $book->borrow_key = $borrow_key;
             $book->book_url = optional($borrowInfo)['data']['url_file'];
             $book->language = optional($bookDetail)['data']['catalog_info']['language_name'] ?? null;
             $book->publisher = optional($bookDetail)['data']['catalog_info']['organization_group_name'] ?? null;
             $extractedPath = $this->downloadBookFile($book) ?? null;
             if (empty($extractedPath)) {
-                $error = 'Failed to download book file.';
+                $error = 'Gagal mengunduh file buku';
             } else {
                 $book->path = $extractedPath;
                 $book->save();
