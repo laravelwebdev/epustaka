@@ -28,7 +28,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 MenuSection::resource(\App\Nova\User::class)->icon('users'),
                 MenuSection::resource(\App\Nova\Account::class)->icon('key'),
                 MenuSection::resource(\App\Nova\Book::class)->icon('book-open'),
-                MenuItem::externalLink('Kontak Support', 'https://wa.me/6287716206091')->icon('chat-bubble-bottom-center'),
+                MenuItem::externalLink('Kontak Support', 'https://wa.me/6287716206091'),
             ];
         });
 
