@@ -41,28 +41,22 @@ class DownloadBook extends Action
             ->where('user_id', $user_id)
             ->exists();
         if (optional($user)->points < 1) {
-            return Action::redirect(route('buypoin'));
+            return Action::redirect('Poin Tidak Cukup', route('buypoin'));
         }
         // cek apakah buku sdh ada di koleksi user
         if ($exist) {
             return Action::message('Buku ini sudah pernah diunduh sebelumnya. Silakan Cek di koleksi buku kamu');
         }
+        //kurangi poin user
         DB::transaction(function () use ($user) {
             $user->decrement('points', 1);
         });
+        $user->refresh();
         if ($book) {
             $book->users()->attach($user_id);
 
             return Action::message(' Buku telah ditambahkan ke koleksi kamu.');
         }
-        // // cek apakah buku sdh ada, jika ada langsung attach
-        // $download = new IpusnasDownloader($fields->account_id);
-        // // extract book id from the URL path safely
-
-        // $result = $download->getBook($bookId);
-        // if ($result !== null) {
-        //     return Action::danger($result);
-        // }
 
         return Action::message('Penambahan Buku sedang berlangsung. Cek notifikasi secara berkala.');
     }
