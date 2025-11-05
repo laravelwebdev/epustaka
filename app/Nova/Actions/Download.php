@@ -26,6 +26,11 @@ class Download extends Action
     public function handle(ActionFields $fields, Collection $models)
     {
         $model = $models->first();
+
+        if (! $model->using_drm || $model->file_ext === 'epub') {
+            return ActionResponse::redirect(route('download', ['filename' => basename($model->path)]));
+
+        }
         $password = IpusnasDecryptor::generatePasswordPDF(
             $model->ipusnas_user_id,
             $model->ipusnas_book_id,

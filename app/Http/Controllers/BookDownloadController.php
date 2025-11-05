@@ -51,7 +51,7 @@ class BookDownloadController extends Controller
             $zip->addFile($filePath, basename($filePath));
 
             // Tambahkan file password.txt
-            $zip->addFromString('password.txt', "password={$password}");
+            $zip->addFromString('password.txt', "{$password}");
 
             $zip->close();
         } else {

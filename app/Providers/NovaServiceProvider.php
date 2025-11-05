@@ -32,9 +32,9 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     MenuItem::resource(\App\Nova\Account::class),
                     MenuItem::resource(\App\Nova\Book::class),
                 ])->icon('book-open'),
-                MenuSection::make('Help', [
-                    MenuItem::externalLink('Kontak Support', 'https://wa.me/6287716206091'),
-                    MenuItem::externalLink('PDF Password Remover', 'https://www.ilovepdf.com/unlock_pdf'),
+                MenuSection::make('Support', [
+                    MenuItem::externalLink('Help', 'https://wa.me/6287716206091')->openInNewTab(),
+                    MenuItem::externalLink('PDF Password Remover', 'https://www.ilovepdf.com/unlock_pdf')->openInNewTab(),
                 ])->icon('question-mark-circle'),
 
             ];
