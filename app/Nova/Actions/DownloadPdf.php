@@ -33,7 +33,7 @@ class DownloadPdf extends Action
             $model->epustaka_id,
             $model->borrow_key
         );
-        return Action::redirect(route('view.book', ['pdfPass' => $password, 'filename' => basename($model->path)]));
+        return Action::visit(route('view.book', ['pdfPass' => $password, 'filename' => basename($model->path)]));
     }
 
     /**

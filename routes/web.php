@@ -17,7 +17,10 @@ Route::get('/dashboard', function () {
 
 Route::get('/books/{filename}', [PdfController::class, 'servePdf'])->name('serve.pdf');
 
-Route::get('/view-book/{pdfPass}/{filename}', [PdfController::class, 'showView'])->name('view.book');
+Route::get('/view-book/{pdfPass}/{filename}', [PdfController::class, 'showView'])
+    ->name('view.book')
+    ->prefix(config('nova.path'))
+    ->middleware(['auth', 'verified']);
 
 
 require __DIR__.'/auth.php';
