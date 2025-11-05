@@ -33,12 +33,12 @@
 
     document.getElementById('go').addEventListener('click', async () => {
   // Password di-hardcode sesuai permintaan
-  const password = '{{ password }}';
+  const password = '{{ $password }}';
 
       try {
   // ambil blob PDF dari route Laravel (asumsi: GET /decrypt-pdf menghasilkan PDF)
   // Jika route berbeda, ubah path di sini.
-  const res = await fetch('{{ route('decrypt-pdf') }}');
+  const res = await fetch('{{ $fetchUrl }}');
         if (!res.ok) throw new Error('Gagal fetch encrypt.pdf: ' + res.status);
 
         // Siapkan UI progress
