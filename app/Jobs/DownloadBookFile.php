@@ -55,4 +55,19 @@ class DownloadBookFile implements ShouldQueue
             );
         }
     }
+
+    public function failed(\Throwable $exception): void
+    {
+        $user_id = Account::find($this->accountId)->user_id;
+        $user = User::find($user_id);
+        DB::transaction(function () use ($user) {
+            $user->increment('points', 1);
+        });
+        $user->notify(
+            NovaNotification::make()
+                ->message('Unduh Buku Gagal Dilakukan. Poin Anda Telah dikembalikan. Terima Kasih!')
+                ->icon('exclamation-triangle')
+                ->type('error')
+        );
+    }
 }
