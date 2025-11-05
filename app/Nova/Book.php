@@ -2,9 +2,11 @@
 
 namespace App\Nova;
 
-use App\Nova\Actions\DownloadBook;
-use Laravel\Nova\Fields\Image;
+use Laravel\Nova\Nova;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Image;
+use Laravel\Nova\Actions\Action;
+use App\Nova\Actions\DownloadBook;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Book extends Resource
@@ -128,6 +130,7 @@ class Book extends Resource
             DownloadBook::make()->standalone()
                 ->confirmText('Unduh buku dari iPusnas?')
                 ->size('7xl'),
+            Action::visit('Download', Nova::url('/api/books/download/' . $this->id))->sole(),
         ];
     }
 }
