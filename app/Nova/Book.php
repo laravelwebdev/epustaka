@@ -2,12 +2,13 @@
 
 namespace App\Nova;
 
-use Laravel\Nova\Nova;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Image;
-use Laravel\Nova\Actions\Action;
 use App\Nova\Actions\DownloadBook;
+use App\Nova\Metrics\Points;
+use Laravel\Nova\Actions\Action;
+use Laravel\Nova\Fields\Image;
+use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Nova;
 
 class Book extends Resource
 {
@@ -96,7 +97,11 @@ class Book extends Resource
      */
     public function cards(NovaRequest $request)
     {
-        return [];
+        return [
+            Points::make()
+                ->width('1/2')
+                ->refreshWhenActionsRun(),
+        ];
     }
 
     /**
@@ -130,7 +135,7 @@ class Book extends Resource
             DownloadBook::make()->standalone()
                 ->confirmText('Unduh buku dari iPusnas?')
                 ->size('7xl'),
-            Action::visit('Download', Nova::url('/api/books/download/' . $this->id))->sole(),
+            Action::visit('Download', Nova::url('/api/books/download/'.$this->id))->sole(),
         ];
     }
 }
