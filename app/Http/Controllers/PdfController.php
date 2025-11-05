@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\IpusnasDecryptor;
+use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,7 +40,9 @@ class PdfController extends Controller
     public function showView($filename)
     {
         $fetchUrl = route('serve.pdf', ['filename' => $filename]);
-        $password = 'pass123'; // or fetch from config/db
+        $path =  'books/' . $filename;
+        $book = Book::where('file_path', $path)->first();
+        $password = IpusnasDecryptor::generatePasswordPDF($book->ipusnas_user_id, $book->ipusnas_book_id, $book->epustaka_id, $book->borrow_key);
 
         return view('pdf', compact('fetchUrl', 'password'));
     }
