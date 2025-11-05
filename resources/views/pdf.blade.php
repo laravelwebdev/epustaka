@@ -113,7 +113,9 @@
           const ext = (filename || '').split('.').pop().toLowerCase();
           if (ext === 'epub') {
             // kirim file langsung, gunakan MIME type EPUB
-            sendFile(arrayBuffer, filename || 'download.epub', 'application/epub+zip');
+            sendFile(arrayBuffer, 'decrypted.epub', 'application/epub+zip');
+            // free buffer to avoid keeping large memory
+            try { arrayBuffer = null; } catch (e) {}
             // reset UI
             document.getElementById('go').disabled = false;
             document.getElementById('progress-container').style.display = 'none';
@@ -133,10 +135,30 @@
               qpdf.save('input.pdf', arrayBuffer);
               qpdf.execute(['--decrypt', '--password=' + password, '--', 'input.pdf', 'output.pdf']);
               qpdf.load('output.pdf', function (err, outArrayBuffer) {
+                // Always attempt to cleanup Emscripten MEMFS files and free buffers
+                function _cleanup() {
+                  try {
+                    if (qpdf && qpdf.FS) {
+                      try { qpdf.FS.unlink('/input.pdf'); } catch (e) {}
+                      try { qpdf.FS.unlink('input.pdf'); } catch (e) {}
+                      try { qpdf.FS.unlink('/output.pdf'); } catch (e) {}
+                      try { qpdf.FS.unlink('output.pdf'); } catch (e) {}
+                    }
+                  } catch (e) {}
+                  try { outArrayBuffer = null; } catch (e) {}
+                  try { arrayBuffer = null; } catch (e) {}
+                }
+
                 if (err) {
                   alert('QPDF error: ' + err.message);
+                  _cleanup();
                 } else {
-                  sendFile(outArrayBuffer, 'decrypted.pdf');
+                  try {
+                    sendFile(outArrayBuffer, 'decrypted.pdf');
+                  } catch (e) {
+                    // ignore send errors
+                  }
+                  _cleanup();
                 }
               });
             } catch (e) {
