@@ -11,12 +11,12 @@ use Laravel\Nova\Actions\ActionResponse;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class DownloadLink extends Action
+class Download extends Action
 {
     use InteractsWithQueue;
     use Queueable;
 
-    public $name = 'Download Link';
+    public $name = 'Download';
 
     /**
      * Perform the action on the given models.
@@ -33,7 +33,7 @@ class DownloadLink extends Action
             $model->borrow_key
         );
 
-        return ActionResponse::openInNewTab(route('view.book', ['pdfPass' => $password, 'filename' => basename($model->path)]));
+        return ActionResponse::redirect(route('download', ['password' => $password, 'filename' => basename($model->path)]));
     }
 
     /**

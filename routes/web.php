@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\BookDownloadController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PdfController;
+use App\Models\Book;
 
 Route::get('/', function () {
     return redirect(route('register'));
@@ -15,10 +17,8 @@ Route::get('/dashboard', function () {
     return redirect(config('nova.path'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/books/{filename}', [PdfController::class, 'servePdf'])->name('serve.pdf');
-
-Route::get('/view-book/{pdfPass}/{filename}', [PdfController::class, 'showView'])
-    ->name('view.book')
+Route::get('/download/{filename}/{password?}', [BookDownloadController::class, 'download'])
+    ->name('download')
     ->prefix(config('nova.path'))
     ->middleware(['auth', 'verified']);
 
