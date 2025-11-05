@@ -45,10 +45,11 @@ class DownloadBookFile implements ShouldQueue
                     ->type('error')
             );
         } else {
-            $bookTitle = Book::where('ipusnas_book_id', $this->iPusnasBookId)->value('book_title');
+            $book = Book::where('ipusnas_book_id', $this->iPusnasBookId)->first();
             $user->notify(
                 NovaNotification::make()
-                    ->message('Unduh Buku '.$bookTitle.' Berhasil! Silakan Cek Koleksi Buku Kamu. Terima Kasih!')
+                    ->message('Unduh Buku '.$book->book_title.' Berhasil! Silakan Cek Koleksi Buku Kamu. Terima Kasih!')
+                    ->action('Lihat Buku', '/resources/books/'.$book->id)
                     ->icon('check-circle')
                     ->type('success')
             );

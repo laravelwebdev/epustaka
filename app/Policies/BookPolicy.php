@@ -20,8 +20,7 @@ class BookPolicy
      */
     public function view(User $user, Book $book): bool
     {
-        // return $user->books()->where('book_id', $book->id)->exists();
-        return true;
+        return $user->books()->where('book_id', $book->id)->exists();
     }
 
     /**
