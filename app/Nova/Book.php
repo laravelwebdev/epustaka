@@ -139,7 +139,8 @@ class Book extends Resource
         return [
             DownloadBook::make()->standalone()
                 ->confirmText('Pinjam buku dari iPusnas?')
-                ->size('7xl'),
+                ->size('7xl')
+                ->onlyOnIndex(),
             DownloadPdf::make()->sole()
                 ->confirmText('Unduh Buku?'),
         ];

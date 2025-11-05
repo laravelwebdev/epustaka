@@ -18,9 +18,9 @@
 
 
   <script>
-    // helper: download ArrayBuffer sebagai file
-    function sendFile(arrayBuffer, filename = 'output.pdf') {
-      const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+    // helper: download ArrayBuffer sebagai file (bisa set MIME)
+    function sendFile(arrayBuffer, filename = 'output.pdf', mime = 'application/pdf') {
+      const blob = new Blob([arrayBuffer], { type: mime });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -36,9 +36,9 @@
   const password = '{{ $password }}';
 
       try {
-  // ambil blob PDF dari route Laravel (asumsi: GET /decrypt-pdf menghasilkan PDF)
-  // Jika route berbeda, ubah path di sini.
-  const res = await fetch('{{ $fetchUrl }}');
+    // ambil blob dari route Laravel
+    // Jika URL berakhiran .epub, nanti akan langsung didownload tanpa decrypt
+    const res = await fetch('{{ $fetchUrl }}');
         if (!res.ok) throw new Error('Gagal fetch encrypt.pdf: ' + res.status);
 
         // Siapkan UI progress
@@ -86,6 +86,40 @@
           // Fallback: jika streaming tidak tersedia, ambil seluruh buffer
           arrayBuffer = await res.arrayBuffer();
         }
+
+        // Jika file adalah EPUB (berakhiran .epub) -> langsung download tanpa decrypt
+        (function () {
+          // dapatkan nama file dari header atau path
+          const contentDisposition = res.headers.get('content-disposition') || '';
+          let filename = null;
+          const cdMatch = /filename\*?=(?:UTF-8''?)?\s*"?([^";]+)/i.exec(contentDisposition);
+          if (cdMatch && cdMatch[1]) {
+            try {
+              filename = decodeURIComponent(cdMatch[1]);
+            } catch (e) {
+              filename = cdMatch[1];
+            }
+          }
+
+          // fallback: dari URL path
+          try {
+            const urlPath = new URL('{{ $fetchUrl }}', location.href).pathname;
+            const seg = urlPath.split('/').pop();
+            if (!filename && seg) filename = seg;
+          } catch (e) {
+            if (!filename) filename = '{{ $fetchUrl }}'.split('/').pop();
+          }
+
+          const ext = (filename || '').split('.').pop().toLowerCase();
+          if (ext === 'epub') {
+            // kirim file langsung, gunakan MIME type EPUB
+            sendFile(arrayBuffer, filename || 'download.epub', 'application/epub+zip');
+            // reset UI
+            document.getElementById('go').disabled = false;
+            document.getElementById('progress-container').style.display = 'none';
+            return;
+          }
+        })();
 
         // Reset UI progress
         goBtn.disabled = false;
