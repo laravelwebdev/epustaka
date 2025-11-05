@@ -3,9 +3,10 @@
 namespace App\Nova\Metrics;
 
 use DateTimeInterface;
-use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Metrics\Value;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Metrics\ValueResult;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class BooksCount extends Value
 {
