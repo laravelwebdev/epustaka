@@ -41,7 +41,7 @@ class PdfController extends Controller
     {
         $fetchUrl = route('serve.pdf', ['filename' => $filename]);
         $path =  'books/' . $filename;
-        $book = Book::where('file_path', $path)->first();
+        $book = Book::where('path', $path)->first();
         $password = IpusnasDecryptor::generatePasswordPDF($book->ipusnas_user_id, $book->ipusnas_book_id, $book->epustaka_id, $book->borrow_key);
 
         return view('pdf', compact('fetchUrl', 'password'));
