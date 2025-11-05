@@ -173,11 +173,8 @@
             arrayBuffer = null; // 🔥 free input buffer memory
 
             qpdf.execute(['--decrypt', '--password=' + password, '--', 'input.pdf', 'output.pdf']);
-            qpdf.remove('input.pdf'); // 🔥 remove source file from WASM memory
 
             qpdf.load('output.pdf', function (err, outArrayBuffer) {
-              setTimeout(() => { qpdf.remove('output.pdf'); }, 60); // 🔥 free decrypted buffer later
-
               if (err) {
                 alert('QPDF error: ' + err.message);
               } else {
