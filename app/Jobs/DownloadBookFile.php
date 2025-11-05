@@ -40,7 +40,7 @@ class DownloadBookFile implements ShouldQueue
             });
             $user->notify(
                 NovaNotification::make()
-                    ->message('Unduh Buku Gagal Dilakukan dengan alasan '.$result.'. Poin Anda Telah dikembalikan. Terima Kasih!')
+                    ->message('Gagal menambahkan buku ke koleksi kamu dengan alasan '.$result.'. Poin Anda Telah dikembalikan. Terima Kasih!')
                     ->icon('exclamation-triangle')
                     ->type('error')
             );
@@ -48,7 +48,7 @@ class DownloadBookFile implements ShouldQueue
             $book = Book::where('ipusnas_book_id', $this->iPusnasBookId)->first();
             $user->notify(
                 NovaNotification::make()
-                    ->message('Unduh Buku '.$book->book_title.' Berhasil! Silakan Cek Koleksi Buku Kamu. Terima Kasih!')
+                    ->message('Buku '.$book->book_title.' Berhasil ditambahkan ke Koleksi buku Kamu! Silakan Cek Koleksi Buku Kamu. Terima Kasih!')
                     ->action('Lihat Buku', '/resources/books/'.$book->id)
                     ->icon('check-circle')
                     ->type('success')
@@ -65,7 +65,7 @@ class DownloadBookFile implements ShouldQueue
         });
         $user->notify(
             NovaNotification::make()
-                ->message('Unduh Buku Gagal Dilakukan. Poin Anda Telah dikembalikan. Terima Kasih!')
+                ->message('Gagal menambahkan buku ke koleksi kamu. Poin Anda Telah dikembalikan. Terima Kasih!')
                 ->icon('exclamation-triangle')
                 ->type('error')
         );

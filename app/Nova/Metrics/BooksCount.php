@@ -10,6 +10,8 @@ use Laravel\Nova\Metrics\ValueResult;
 
 class BooksCount extends Value
 {
+    public $title = 'Books';
+
     /**
      * Calculate the value of the metric.
      */

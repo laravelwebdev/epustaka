@@ -45,7 +45,7 @@ class DownloadBook extends Action
         }
         // cek apakah buku sdh ada di koleksi user
         if ($exist) {
-            return Action::message('Buku ini sudah pernah diunduh sebelumnya. Silakan Cek di koleksi buku kamu');
+            return Action::message('Buku ini sudah ada di koleksi kamu. Silakan Cek di koleksi buku kamu');
         }
         // kurangi poin user
         DB::transaction(function () use ($user) {
