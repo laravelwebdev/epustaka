@@ -23,6 +23,8 @@ class DownloadBook extends Action
 
     public $withoutActionEvents = true;
 
+    public $name = 'Tambah Koleksi Buku';
+
     /**
      * Perform the action on the given models.
      *
