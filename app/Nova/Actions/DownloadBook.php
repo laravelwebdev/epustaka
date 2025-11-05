@@ -2,7 +2,7 @@
 
 namespace App\Nova\Actions;
 
-use App\Helpers\IpusnasDownloader;
+use App\Jobs\DownloadBookFile;
 use App\Models\Account;
 use App\Models\Book;
 use Illuminate\Bus\Queueable;
@@ -41,13 +41,13 @@ class DownloadBook extends Action
             ->where('user_id', $user_id)
             ->exists();
         if (optional($user)->points < 1) {
-            return Action::redirect('Poin Tidak Cukup', route('buypoin'));
+            return Action::redirect(route('buypoin'));
         }
         // cek apakah buku sdh ada di koleksi user
         if ($exist) {
             return Action::message('Buku ini sudah pernah diunduh sebelumnya. Silakan Cek di koleksi buku kamu');
         }
-        //kurangi poin user
+        // kurangi poin user
         DB::transaction(function () use ($user) {
             $user->decrement('points', 1);
         });
@@ -57,6 +57,8 @@ class DownloadBook extends Action
 
             return Action::message(' Buku telah ditambahkan ke koleksi kamu.');
         }
+
+        DownloadBookFile::dispatch($fields->account_id, $iPusnasBookId);
 
         return Action::message('Penambahan Buku sedang berlangsung. Cek notifikasi secara berkala.');
     }

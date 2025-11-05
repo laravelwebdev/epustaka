@@ -2,12 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Jobs\DownloadBookFile;
 use App\Models\Account;
 use App\Models\Book;
 use App\Models\FailedBook;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class IpusnasDownloader
 {
@@ -155,8 +155,51 @@ class IpusnasDownloader
         return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
+    private function downloadBookFile(Book $book): bool
+    {
+        $headers = [
+            'Origin' => 'https://ipusnas2.perpusnas.go.id',
+            'Referer' => 'https://ipusnas2.perpusnas.go.id/',
+            'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
+            'Content-Type' => 'application/vnd.api+json',
+        ];
+        $url = $book->book_url;
+        $safeName = md5($book->ipusnas_book_id);
+        $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'pdf';
+        $filename = "{$safeName}.{$extension}";
+        $path = "temp/{$filename}";
+
+        $response = Http::withHeaders($headers)->timeout(1200)->get($url);
+        if ($response->failed()) {
+            $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $book->ipusnas_book_id]);
+            $failed->failed_url = true;
+            $failed->save();
+
+            return false;
+        }
+        // Simpan ke temporary storage
+        Storage::put($path, $response->body());
+
+        if ($book->using_drm) {
+            $passwordZip = IpusnasDecryptor::generatePasswordZip(
+                $book->ipusnas_user_id,
+                $book->ipusnas_book_id,
+                $book->epustaka_id,
+                $book->borrow_key
+            );
+
+        } else {
+            $passwordZip = '';
+        }
+        $extractedPath = (new ZipExtractor)->extract(storage_path('app/private/'.$path), $passwordZip);
+        Book::where('ipusnas_book_id', $book->ipusnas_book_id)->update(['path' => $extractedPath]);
+        FailedBook::where('ipusnas_book_id', $book->ipusnas_book_id)->delete();
+
+        return true;
+    }
+
     /* ---------------------------
-       Get Book
+    Get Book
     ----------------------------*/
     public function getBook($bookId)
     {
@@ -218,8 +261,13 @@ class IpusnasDownloader
             $book->book_url = optional($borrowInfo)['data']['url_file'];
             $book->language = optional($bookDetail)['data']['catalog_info']['language_name'] ?? null;
             $book->publisher = optional($bookDetail)['data']['catalog_info']['organization_group_name'] ?? null;
-            $book->save();
-            DownloadBookFile::dispatch($book);
+            $success = $this->downloadBookFile($book);
+            if (! $success) {
+                $error = 'Failed to download book file.';
+            } else {
+                $book->save();
+            }
+
         }
 
         return $error;
