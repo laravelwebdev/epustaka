@@ -6,6 +6,8 @@ use App\Nova\Actions\DownloadBook;
 use App\Nova\Actions\DownloadPdf;
 use App\Nova\Metrics\BooksCount;
 use App\Nova\Metrics\Points;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\Image;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -144,5 +146,17 @@ class Book extends Resource
             DownloadPdf::make()->sole()
                 ->confirmText('Unduh Buku?'),
         ];
+    }
+
+    /**
+     * Build an "index" query for the given resource.
+     */
+    public static function indexQuery(NovaRequest $request, Builder $query): Builder
+    {
+        $user = Auth::user();
+
+        return $query->whereHas('users', function ($q) use ($user) {
+            $q->where('users.id', $user->id);
+        });
     }
 }
