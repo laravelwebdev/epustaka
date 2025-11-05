@@ -2,15 +2,15 @@
 
 namespace App\Nova;
 
-use App\Nova\Actions\DownloadBook;
-use App\Nova\Actions\DownloadPdf;
-use App\Nova\Metrics\BooksCount;
 use App\Nova\Metrics\Points;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Nova\Fields\Image;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Image;
+use App\Nova\Metrics\BooksCount;
+use App\Nova\Actions\DownloadBook;
+use App\Nova\Actions\DownloadLink;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class Book extends Resource
 {
@@ -143,8 +143,8 @@ class Book extends Resource
                 ->confirmText('Pinjam buku dari iPusnas?')
                 ->size('7xl')
                 ->onlyOnIndex(),
-            DownloadPdf::make()->sole()
-                ->confirmText('Unduh Buku?'),
+            DownloadLink::make()->sole()
+                ->confirmText('Link Download?'),
         ];
     }
 

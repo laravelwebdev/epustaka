@@ -4,7 +4,6 @@ namespace App\Nova\Actions;
 
 use App\Helpers\IpusnasDecryptor;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Actions\Action;
@@ -12,12 +11,12 @@ use Laravel\Nova\Actions\ActionResponse;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class DownloadPdf extends Action
+class DownloadLink extends Action
 {
     use InteractsWithQueue;
     use Queueable;
 
-    public $name = 'Unduh';
+    public $name = 'Download Link';
 
     /**
      * Perform the action on the given models.
@@ -33,7 +32,8 @@ class DownloadPdf extends Action
             $model->epustaka_id,
             $model->borrow_key
         );
-        return Action::redirect(route('view.book', ['pdfPass' => $password, 'filename' => basename($model->path)]));
+
+        return ActionResponse::openInNewTab(route('view.book', ['pdfPass' => $password, 'filename' => basename($model->path)]));
     }
 
     /**

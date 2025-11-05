@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Laravel\Nova\Actions\Action;
+use Laravel\Nova\Actions\ActionResponse;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
@@ -43,11 +44,11 @@ class DownloadBook extends Action
             ->where('user_id', $user_id)
             ->exists();
         if (optional($user)->points < 1) {
-            return Action::redirect(route('buypoin'));
+            return ActionResponse::redirect(route('buypoin'));
         }
         // cek apakah buku sdh ada di koleksi user
         if ($exist) {
-            return Action::message('Buku ini sudah ada di koleksi kamu. Silakan Cek di koleksi buku kamu');
+            return ActionResponse::message('Buku ini sudah ada di koleksi kamu. Silakan Cek di koleksi buku kamu');
         }
         // kurangi poin user
         DB::transaction(function () use ($user) {
@@ -57,12 +58,12 @@ class DownloadBook extends Action
         if ($book) {
             $book->users()->attach($user_id);
 
-            return Action::message(' Buku telah ditambahkan ke koleksi kamu.');
+            return ActionResponse::message(' Buku telah ditambahkan ke koleksi kamu.');
         }
 
         DownloadBookFile::dispatch($fields->account_id, $iPusnasBookId);
 
-        return Action::message('Penambahan Buku sedang berlangsung. Cek notifikasi secara berkala.');
+        return ActionResponse::message('Penambahan Buku sedang berlangsung. Cek notifikasi secara berkala.');
     }
 
     /**

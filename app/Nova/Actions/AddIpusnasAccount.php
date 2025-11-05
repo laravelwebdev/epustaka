@@ -7,8 +7,8 @@ use App\Models\Account;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Laravel\Nova\Actions\Action;
+use Laravel\Nova\Actions\ActionResponse;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Fields\Email;
 use Laravel\Nova\Fields\Text;
@@ -43,9 +43,10 @@ class AddIpusnasAccount extends Action
             $account->organization_id = $data['data']['organization_id'] ?? null;
             $account->verified = $data['data']['verified'] ?? false;
             $account->save();
-            return Action::message('Akun IPusnas berhasil ditambahkan.');
+
+            return ActionResponse::message('Akun IPusnas berhasil ditambahkan.');
         } else {
-            return Action::danger($result['data']['error']['message']);
+            return ActionResponse::danger($result['data']['error']['message']);
         }
     }
 
