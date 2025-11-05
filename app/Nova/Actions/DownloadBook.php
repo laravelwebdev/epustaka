@@ -47,9 +47,9 @@ class DownloadBook extends Action
         if ($exist) {
             return Action::message('Buku ini sudah pernah diunduh sebelumnya. Silakan Cek di koleksi buku kamu');
         }
-        $user->points -= 1;
-        $user->save();
-        $user->refresh();
+        DB::transaction(function () use ($user) {
+            $user->decrement('points', 1);
+        });
         if ($book) {
             $book->users()->attach($user_id);
 
