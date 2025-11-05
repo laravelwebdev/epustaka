@@ -5,7 +5,6 @@ namespace App\Helpers;
 use App\Models\Account;
 use App\Models\Book;
 use App\Models\FailedBook;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -268,7 +267,8 @@ class IpusnasDownloader
                 $book->path = $extractedPath;
                 $book->save();
                 $book->refresh();
-                $book->users()->attach(Auth::user()->id);
+                $userId = optional($account)->user_id;
+                $book->users()->attach($userId);
             }
 
         }
