@@ -2,14 +2,14 @@
 
 namespace App\Nova;
 
-use Laravel\Nova\Nova;
-use App\Nova\Metrics\Points;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Image;
-use App\Nova\Metrics\BooksCount;
-use Laravel\Nova\Actions\Action;
 use App\Nova\Actions\DownloadBook;
+use App\Nova\Metrics\BooksCount;
+use App\Nova\Metrics\Points;
+use Laravel\Nova\Actions\Action;
+use Laravel\Nova\Fields\Image;
+use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Nova;
 
 class Book extends Resource
 {
@@ -21,6 +21,8 @@ class Book extends Resource
     public static $model = \App\Models\Book::class;
 
     public static $with = ['users'];
+
+    public static $perPageOptions = [5, 10];
 
     public static function label()
     {
