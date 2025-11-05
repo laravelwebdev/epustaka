@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Models\Account;
 use App\Models\Book;
 use App\Models\FailedBook;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -155,7 +156,7 @@ class IpusnasDownloader
         return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 
-    private function downloadBookFile(Book $book): bool
+    private function downloadBookFile(Book $book)
     {
         $headers = [
             'Origin' => 'https://ipusnas2.perpusnas.go.id',
@@ -175,7 +176,7 @@ class IpusnasDownloader
             $failed->failed_url = true;
             $failed->save();
 
-            return false;
+            return;
         }
         // Simpan ke temporary storage
         Storage::put($path, $response->body());
@@ -192,10 +193,9 @@ class IpusnasDownloader
             $passwordZip = '';
         }
         $extractedPath = (new ZipExtractor)->extract(storage_path('app/private/'.$path), $passwordZip);
-        Book::where('ipusnas_book_id', $book->ipusnas_book_id)->update(['path' => $extractedPath]);
         FailedBook::where('ipusnas_book_id', $book->ipusnas_book_id)->delete();
 
-        return true;
+        return $extractedPath;
     }
 
     /* ---------------------------
@@ -261,11 +261,14 @@ class IpusnasDownloader
             $book->book_url = optional($borrowInfo)['data']['url_file'];
             $book->language = optional($bookDetail)['data']['catalog_info']['language_name'] ?? null;
             $book->publisher = optional($bookDetail)['data']['catalog_info']['organization_group_name'] ?? null;
-            $success = $this->downloadBookFile($book);
-            if (! $success) {
+            $extractedPath = $this->downloadBookFile($book) ?? null;
+            if (empty($extractedPath)) {
                 $error = 'Failed to download book file.';
             } else {
+                $book->path = $extractedPath;
                 $book->save();
+                $book->refresh();
+                $book->users()->attach(Auth::user()->id);
             }
 
         }
