@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Nova\Dashboards\Main;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
 
@@ -17,6 +20,15 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        Nova::mainMenu(function (Request $request) {
+            return [
+                MenuSection::dashboard(Main::class)->icon('exclamation-triangle'),
+                MenuSection::resource(\App\Nova\User::class)->icon('users'),
+                MenuSection::resource(\App\Nova\Account::class)->icon('key'),
+                MenuSection::resource(\App\Nova\Book::class)->icon('book'),
+            ];
+        });
 
         Nova::serving(function () {
             Route::post('/nova/logout', function () {
