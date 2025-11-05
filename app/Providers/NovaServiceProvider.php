@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use Laravel\Nova\Menu\MenuItem;
 use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
@@ -27,7 +28,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 MenuSection::resource(\App\Nova\User::class)->icon('users'),
                 MenuSection::resource(\App\Nova\Account::class)->icon('key'),
                 MenuSection::resource(\App\Nova\Book::class)->icon('book-open'),
-                MenuSection::externalLink('Kontak Support', 'https://wa.me/6287716206091')->icon('chat-bubble-bottom-center'),
+                MenuItem::externalLink('Kontak Support', 'https://wa.me/6287716206091')->icon('chat-bubble-bottom-center'),
             ];
         });
 
