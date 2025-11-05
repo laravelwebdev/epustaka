@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
-use App\Nova\Dashboards\Main;
+use App\Nova\Dashboards\Terms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -24,7 +24,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
         Nova::mainMenu(function (Request $request) {
             return [
-                MenuSection::dashboard(Main::class)->icon('exclamation-triangle'),
+                MenuSection::dashboard(Terms::class)->icon('exclamation-triangle'),
                 MenuSection::make('Admin', [
                     MenuItem::resource(\App\Nova\User::class),
                 ])->icon('key'),
