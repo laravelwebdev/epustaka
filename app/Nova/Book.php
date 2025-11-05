@@ -78,6 +78,12 @@ class Book extends Resource
             Text::make('Description', 'book_description')
                 ->asHtml()
                 ->onlyOnDetail(),
+            Text::make('File Size', 'file_size_info')
+                ->onlyOnDetail(),
+            Text::make('File Extension', 'file_ext')
+                ->onlyOnDetail(),
+            Text::make('language', 'language')
+                ->onlyOnDetail(),
         ];
     }
 
