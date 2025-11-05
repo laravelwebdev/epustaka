@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>QPDF decrypt - callback style</title>
-  <script type="text/javascript" src='{{ asset('js/qpdf.js') }}'></script>
+  <script type="text/javascript" src="{{ asset('js/qpdf.js') }}"></script>
 
   <style>
     body {
@@ -11,7 +11,6 @@
       background: #f2f2f2;
       padding: 40px;
     }
-
     #go {
       background: #3498db;
       border: none;
@@ -22,18 +21,15 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
     #go:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
-
     #progress-container {
       max-width: 400px;
       margin: 25px auto;
       text-align: center;
     }
-
     #progress-bar-wrapper {
       width: 100%;
       background: #ddd;
@@ -41,14 +37,12 @@
       overflow: hidden;
       height: 20px;
     }
-
     #progress {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, #4facfe, #00f2fe);
       transition: width 0.2s ease;
     }
-
     #progress-text {
       margin-top: 6px;
       font-size: 14px;
@@ -114,7 +108,7 @@
           const { done, value } = await reader.read();
           if (done) break;
           chunks.push(value);
-          received += value.length;
+          received += value.byteLength; // ✅ FIX PENTING
 
           if (total) {
             const percent = Math.round((received / total) * 100);
@@ -129,52 +123,35 @@
         let offset = 0;
         for (const chunk of chunks) {
           joined.set(chunk, offset);
-          offset += chunk.length;
+          offset += chunk.byteLength; // ✅ FIX PENTING
         }
 
-        chunks.length = 0; // 🔥 free memory
+        chunks.length = 0; 
         arrayBuffer = joined.buffer;
       } else {
         arrayBuffer = await res.arrayBuffer();
       }
 
-      (function () {
-        const contentDisposition = res.headers.get('content-disposition') || '';
-        let filename = null;
-        const cdMatch = /filename\*?=(?:UTF-8''?)?\s*"?([^";]+)/i.exec(contentDisposition);
-        if (cdMatch && cdMatch[1]) {
-          try { filename = decodeURIComponent(cdMatch[1]); }
-          catch { filename = cdMatch[1]; }
-        }
-
-        try {
-          const urlPath = new URL('{{ $fetchUrl }}', location.href).pathname;
-          const seg = urlPath.split('/').pop();
-          if (!filename && seg) filename = seg;
-        } catch { filename = '{{ $fetchUrl }}'.split('/').pop(); }
-
-        const ext = (filename || '').split('.').pop().toLowerCase();
-        if (ext === 'epub') {
-          sendFile(arrayBuffer, 'download.epub', 'application/epub+zip');
-          goBtn.disabled = false;
-          progressContainer.style.display = 'none';
-          return;
-        }
-      })();
-
-      goBtn.disabled = false;
-      progressContainer.style.display = 'none';
-
+      //=== menjalankan QPDF ===//
       QPDF.path = '{{ asset('js') }}/';
       QPDF({
         ready: function (qpdf) {
           try {
             qpdf.save('input.pdf', arrayBuffer);
-            arrayBuffer = null; // 🔥 free input buffer memory
 
-            qpdf.execute(['--decrypt', '--password=' + password, '--', 'input.pdf', 'output.pdf']);
+            qpdf.execute([
+              '--decrypt',
+              '--password=' + password,
+              '--stream-data=copy',   // ✅ PERTAHANKAN STREAM ASLI TANPA RECOMPRESS
+              '--',
+              'input.pdf',
+              'output.pdf'
+            ]);
 
             qpdf.load('output.pdf', function (err, outArrayBuffer) {
+              goBtn.disabled = false;
+              progressContainer.style.display = 'none';
+
               if (err) {
                 alert('QPDF error: ' + err.message);
               } else {
@@ -187,6 +164,7 @@
           }
         }
       });
+
     } catch (fetchErr) {
       alert('Gagal: ' + (fetchErr.message || fetchErr));
     }
