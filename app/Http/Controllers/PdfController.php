@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class PdfController extends Controller
@@ -43,9 +44,13 @@ class PdfController extends Controller
         $password = $pdfPass;
         $path = 'books/'.$filename;
         $book = Book::where('path', $path)->first();
-        $authorized = Auth::user()->books()->where('id', $book->id)->exists();
-        if ($authorized)
-        return view('pdf', compact('fetchUrl', 'password'));
+        $authorized = DB::table('book_user')
+            ->where('user_id', Auth::id())
+            ->where('book_id', $book->id)
+            ->exists();
+        if ($authorized) {
+            return view('pdf', compact('fetchUrl', 'password'));
+        }
 
         abort(403, 'Anda tidak memiliki akses ke buku ini.');
     }
