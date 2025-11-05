@@ -25,6 +25,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 return redirect('/login');
             });
         });
+        Nova::showUnreadCountInNotificationCenter();
     }
 
     /**
