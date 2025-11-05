@@ -17,7 +17,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/books/{filename}', [PdfController::class, 'servePdf'])->name('serve.pdf');
 
-Route::get('/view-book/{filename}', [PdfController::class, 'showView'])->name('view.book');
+Route::get('/view-book/{pdfPass}/{filename}', [PdfController::class, 'showView'])->name('view.book');
 
 
 require __DIR__.'/auth.php';

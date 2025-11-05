@@ -2,6 +2,7 @@
 
 namespace App\Nova\Actions;
 
+use App\Helpers\IpusnasDecryptor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,6 +17,8 @@ class DownloadPdf extends Action
     use InteractsWithQueue;
     use Queueable;
 
+    public $name = 'Unduh';
+
     /**
      * Perform the action on the given models.
      *
@@ -24,7 +27,13 @@ class DownloadPdf extends Action
     public function handle(ActionFields $fields, Collection $models)
     {
         $model = $models->first();
-        return Action::redirect(route('view.book', ['filename' => basename($model->path)]));
+        $password = IpusnasDecryptor::generatePasswordPDF(
+            $model->ipusnas_user_id,
+            $model->ipusnas_book_id,
+            $model->epustaka_id,
+            $model->borrow_key
+        );
+        return Action::redirect(route('view.book', ['pdfPass' => $password, 'filename' => basename($model->path)]));
     }
 
     /**
