@@ -40,7 +40,8 @@ class AutoBorrow extends Command
         if (! $success) {
             DownloadBookFile::dispatch($accountId, $bookId, false);
         } else {
-            $this->info('Book already borrowed.');
+            $borrow->borrowed = true;
+            $borrow->save();
         }
     }
 }
