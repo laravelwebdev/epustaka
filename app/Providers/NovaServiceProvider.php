@@ -28,6 +28,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 MenuSection::make('Admin', [
                     MenuItem::resource(\App\Nova\User::class),
                     MenuItem::resource(\App\Nova\BulkDownload::class),
+                    MenuItem::resource(\App\Nova\AutoBorrow::class),
                 ])->icon('key'),
                 MenuSection::make('iPusnas', [
                     MenuItem::resource(\App\Nova\Account::class),
