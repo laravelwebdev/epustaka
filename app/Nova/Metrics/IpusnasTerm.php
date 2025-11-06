@@ -7,7 +7,7 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Metrics\MetricTableRow;
 use Laravel\Nova\Metrics\Table;
 
-class IPusnasTerms extends Table
+class IpusnasTerms extends Table
 {
     /**
      * Calculate the value of the metric.

@@ -3,6 +3,7 @@
 namespace App\Nova;
 
 use App\Nova\Actions\AddIpusnasAccount;
+use App\Nova\Metrics\IpusnasTerms;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Text;
@@ -70,7 +71,9 @@ class Account extends Resource
      */
     public function cards(NovaRequest $request)
     {
-        return [];
+        return [
+            IpusnasTerms::make()->width('full'),
+        ];
     }
 
     /**
