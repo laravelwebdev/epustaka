@@ -59,6 +59,8 @@ class BulkDownload extends Resource
                 ->exceptOnForms(),
             Boolean::make('Is Active', 'is_active')
                 ->rules('required'),
+            Boolean::make('Is Completed', 'is_completed')
+                ->exceptOnForms(),
         ];
     }
 
