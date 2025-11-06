@@ -57,12 +57,7 @@ class AutoBorrow extends Resource
             Boolean::make('Borrowed', 'borrowed')
                 ->sortable()
                 ->exceptOnForms(),
-            URL::make('iPusnas Book URL', function () {
-                return $this->ipusnas_book_id
-                    ? 'https://ipusnas2.perpusnas.go.id/book/' . $this->ipusnas_book_id
-                    : null;
-            })->exceptOnForms()
-                ->label('Lihat'),
+            URL::make('Lihat', fn () => 'https://ipusnas2.perpusnas.go.id/book/'.$this->ipusnas_book_id),
         ];
     }
 
