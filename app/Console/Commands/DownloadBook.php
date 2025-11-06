@@ -50,12 +50,9 @@ class DownloadBook extends Command
             $response = (new Booklist($token))->fetchBookList($categoryId, $offset);
             $bookId = $response['data'][0]['id'];
             $bookExists = Book::where('ipusnas_book_id', $bookId)->exists();
-            if ($bookExists) {
-                $this->info('Book ID '.$bookId.' already exists. Skipping download.');
-
-                return;
+            if (! $bookExists) {
+                DownloadBookFile::dispatch($accountId, $bookId);
             }
-            DownloadBookFile::dispatch($accountId, $bookId);
             $bulk->offset = $offset + 1; // Example increment
             $bulk->save();
         } else {
