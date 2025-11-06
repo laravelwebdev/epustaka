@@ -2,14 +2,15 @@
 
 namespace App\Nova;
 
-use App\Nova\Actions\AddPoint;
-use Illuminate\Http\Request;
-use Laravel\Nova\Auth\PasswordValidationRules;
-use Laravel\Nova\Fields\Gravatar;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Number;
+use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\Text;
+use App\Nova\Actions\AddPoint;
+use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Gravatar;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Auth\PasswordValidationRules;
 
 class User extends Resource
 {
@@ -55,12 +56,14 @@ class User extends Resource
             Text::make('Name')
                 ->sortable()
                 ->rules('required', 'max:255'),
-
             Text::make('Email')
                 ->sortable()
                 ->rules('required', 'email', 'max:254')
                 ->creationRules('unique:users,email')
                 ->updateRules('unique:users,email,{{resourceId}}'),
+            Date::make('Email Verified At')
+                ->sortable()
+                ->rules('nullable', 'date'),
             Number::make('Points')
                 ->sortable()
                 ->rules('nullable', 'integer', 'min:0'),

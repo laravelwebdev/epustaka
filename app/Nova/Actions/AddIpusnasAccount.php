@@ -30,6 +30,10 @@ class AddIpusnasAccount extends Action
      */
     public function handle(ActionFields $fields, Collection $models)
     {
+        $existingAccount = Account::where('email', $fields->email)->first();
+        if ($existingAccount) {
+            return ActionResponse::danger('Akun iPusnas dengan email tersebut sudah pernah terhubung.');
+        }
         $login = new IpusnasDownloader;
 
         $result = $login->login($fields->email, $fields->password);
