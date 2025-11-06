@@ -144,7 +144,7 @@ class Book extends Resource
                 ->size('7xl')
                 ->onlyOnIndex(),
             Download::make()->sole()
-                ->confirmText('Link Download?'),
+                ->confirmText('Apakah Ingin Mengunduh Buku Ini?'),
         ];
     }
 
