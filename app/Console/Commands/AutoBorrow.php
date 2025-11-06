@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\DownloadBookFile;
+use App\Models\AutoBorrow as ModelAutoBorrow;
 use App\Models\Book;
 use Illuminate\Console\Command;
 
@@ -27,7 +28,7 @@ class AutoBorrow extends Command
      */
     public function handle()
     {
-        $borrow = AutoBorrow::first();
+        $borrow = ModelAutoBorrow::first();
         if (! $borrow) {
             $this->info('No auto borrow records found.');
 
