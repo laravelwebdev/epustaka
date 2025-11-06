@@ -8,6 +8,7 @@ use App\Models\Account;
 use App\Models\BulkDownload;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class DownloadBook extends Command
 {
@@ -24,6 +25,14 @@ class DownloadBook extends Command
      * @var string
      */
     protected $description = 'Bulk Download Books from iPusnas';
+
+    private $apiLogin = 'https://api2-ipusnas.perpusnas.go.id/api/auth/login';
+
+    private $baseHeaders = [
+        'Origin' => 'https://ipusnas2.perpusnas.go.id',
+        'Referer' => 'https://ipusnas2.perpusnas.go.id/',
+        'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
+    ];
 
     /**
      * Execute the console command.
@@ -59,5 +68,21 @@ class DownloadBook extends Command
             }
         }
 
+    }
+
+    public function login(string $email, string $password)
+    {
+        $headers = array_merge($this->baseHeaders, [
+            'Content-Type' => 'application/vnd.api+json',
+            'Accept' => 'application/json',
+        ]);
+
+        $response = Http::withHeaders($headers)
+            ->post($this->apiLogin, [
+                'email' => $email,
+                'password' => $password,
+            ]);
+
+        return ['status' => ! $response->failed(), 'data' => $response->json()];
     }
 }
