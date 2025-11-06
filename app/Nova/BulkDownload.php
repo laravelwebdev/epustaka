@@ -18,7 +18,7 @@ class BulkDownload extends Resource
 
     public static function label()
     {
-        return 'BulkDownload';
+        return 'Bulk Download';
     }
 
     /**
