@@ -40,7 +40,12 @@ class DownloadBook extends Command
      */
     public function handle()
     {
-        $bulk = BulkDownload::where('is_active', true)->first();
+        $bulk = BulkDownload::where('is_active', true)->where('is_completed', false)->first();
+        if (! $bulk) {
+            $this->info('No active bulk download found.');
+
+            return;
+        }
         $categoryId = optional($bulk)->category_id;
         $offset = optional($bulk)->offset ?? 0;
         $accountId = 1;
@@ -49,7 +54,15 @@ class DownloadBook extends Command
             $this->getAccessToken($accountId);
             $token = Cache::get('ipusnas_token_'.$accountId);
             $response = (new Booklist($token))->fetchBookList($categoryId, $offset, $limit);
-            foreach ($response['data'] as $book) {
+            $books = $response['data'] ?? [];
+            if (empty($books)) {
+                $bulk->is_completed = true;
+                $bulk->save();
+                $this->info('Bulk download completed.');
+
+                return;
+            }
+            foreach ($books as $book) {
                 $bookId = $book['id'];
                 $bookExists = Book::where('ipusnas_book_id', $bookId)->exists();
                 if (! $bookExists) {

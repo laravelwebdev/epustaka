@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('category_name')->nullable();
             $table->integer('offset')->default(0);
             $table->boolean('is_active')->default(false);
+            $table->boolean('is_completed')->default(false);
             $table->timestamps();
         });
     }
