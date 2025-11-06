@@ -6,7 +6,7 @@ use App\Http\Controllers\PdfController;
 use App\Models\Book;
 
 Route::get('/', function () {
-    return redirect(route('register'));
+    return redirect(route('login'));
 });
 
 Route::get('/buypoin', function () {
