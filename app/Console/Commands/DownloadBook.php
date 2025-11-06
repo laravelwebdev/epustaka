@@ -44,16 +44,19 @@ class DownloadBook extends Command
         $categoryId = optional($bulk)->category_id;
         $offset = optional($bulk)->offset ?? 0;
         $accountId = 1;
+        $limit = 5;
         if ($categoryId) {
             $this->getAccessToken($accountId);
             $token = Cache::get('ipusnas_token_'.$accountId);
-            $response = (new Booklist($token))->fetchBookList($categoryId, $offset);
-            $bookId = $response['data'][0]['id'];
-            $bookExists = Book::where('ipusnas_book_id', $bookId)->exists();
-            if (! $bookExists) {
-                DownloadBookFile::dispatch($accountId, $bookId);
+            $response = (new Booklist($token))->fetchBookList($categoryId, $offset, $limit);
+            foreach ($response['data'] as $book) {
+                $bookId = $book['id'];
+                $bookExists = Book::where('ipusnas_book_id', $bookId)->exists();
+                if (! $bookExists) {
+                    DownloadBookFile::dispatch($accountId, $bookId, false);
+                }
             }
-            $bulk->offset = $offset + 1; // Example increment
+            $bulk->offset = $offset + $limit;
             $bulk->save();
         } else {
             $this->info('No active bulk download found.');

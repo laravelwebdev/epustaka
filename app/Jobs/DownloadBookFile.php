@@ -22,10 +22,13 @@ class DownloadBookFile implements ShouldQueue
 
     protected $accountId;
 
-    public function __construct($accountId, $bookIpusnasId)
+    protected $notify;
+
+    public function __construct($accountId, $bookIpusnasId, $notify = true)
     {
         $this->iPusnasBookId = $bookIpusnasId;
         $this->accountId = $accountId;
+        $this->notify = $notify;
     }
 
     public function handle(): void
@@ -38,21 +41,25 @@ class DownloadBookFile implements ShouldQueue
             DB::transaction(function () use ($user) {
                 $user->increment('points', 1);
             });
-            $user->notify(
-                NovaNotification::make()
-                    ->message('Gagal menambahkan buku ke koleksi kamu dengan alasan '.$result.'. Poin Anda Telah dikembalikan. Terima Kasih!')
-                    ->icon('exclamation-triangle')
-                    ->type('error')
-            );
+            if ($this->notify) {
+                $user->notify(
+                    NovaNotification::make()
+                        ->message('Gagal menambahkan buku ke koleksi kamu dengan alasan '.$result.'. Poin Anda Telah dikembalikan. Terima Kasih!')
+                        ->icon('exclamation-triangle')
+                        ->type('error')
+                );
+            }
         } else {
-            $book = Book::where('ipusnas_book_id', $this->iPusnasBookId)->first();
-            $user->notify(
-                NovaNotification::make()
-                    ->message('Buku '.$book->book_title.' Berhasil ditambahkan ke Koleksi buku Kamu! Silakan Cek Koleksi Buku Kamu. Terima Kasih!')
-                    ->action('Lihat Buku', '/resources/books/'.$book->id)
-                    ->icon('check-circle')
-                    ->type('success')
-            );
+            if ($this->notify) {
+                $book = Book::where('ipusnas_book_id', $this->iPusnasBookId)->first();
+                $user->notify(
+                    NovaNotification::make()
+                        ->message('Buku '.$book->book_title.' Berhasil ditambahkan ke Koleksi buku Kamu! Silakan Cek Koleksi Buku Kamu. Terima Kasih!')
+                        ->action('Lihat Buku', '/resources/books/'.$book->id)
+                        ->icon('check-circle')
+                        ->type('success')
+                );
+            }
         }
     }
 
@@ -63,11 +70,13 @@ class DownloadBookFile implements ShouldQueue
         DB::transaction(function () use ($user) {
             $user->increment('points', 1);
         });
-        $user->notify(
-            NovaNotification::make()
-                ->message('Gagal menambahkan buku ke koleksi kamu. Poin Anda Telah dikembalikan. Terima Kasih!')
-                ->icon('exclamation-triangle')
-                ->type('error')
-        );
+        if ($this->notify) {
+            $user->notify(
+                NovaNotification::make()
+                    ->message('Gagal menambahkan buku ke koleksi kamu. Poin Anda Telah dikembalikan. Terima Kasih!')
+                    ->icon('exclamation-triangle')
+                    ->type('error')
+            );
+        }
     }
 }
