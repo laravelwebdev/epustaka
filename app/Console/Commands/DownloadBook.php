@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Helpers\Booklist;
 use App\Jobs\DownloadBookFile;
 use App\Models\Account;
+use App\Models\Book;
 use App\Models\BulkDownload;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -48,6 +49,12 @@ class DownloadBook extends Command
             $token = Cache::get('ipusnas_token_'.$accountId);
             $response = (new Booklist($token))->fetchBookList($categoryId, $offset);
             $bookId = $response['data'][0]['id'];
+            $bookExists = Book::where('ipusnas_book_id', $bookId)->exists();
+            if ($bookExists) {
+                $this->info('Book ID '.$bookId.' already exists. Skipping download.');
+
+                return;
+            }
             DownloadBookFile::dispatch($accountId, $bookId);
             $bulk->offset = $offset + 1; // Example increment
             $bulk->save();
