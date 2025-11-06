@@ -27,6 +27,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 MenuSection::dashboard(Main::class)->icon('exclamation-triangle'),
                 MenuSection::make('Admin', [
                     MenuItem::resource(\App\Nova\User::class),
+                    MenuItem::resource(\App\Nova\BulkDownload::class),
                 ])->icon('key'),
                 MenuSection::make('iPusnas', [
                     MenuItem::resource(\App\Nova\Account::class),
