@@ -2,11 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Models\Account;
 use App\Models\Book;
+use App\Models\Account;
 use App\Models\FailedBook;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class IpusnasDownloader
@@ -226,6 +227,7 @@ class IpusnasDownloader
         }
         // borrow
         $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, optional($epustaka)['data']['id'] ?? null);
+        Log::warning('Borrow Response: ', $borrowResponse);
         if ($borrowResponse['data']['code'] === 'SUCCESS') {
             // borrow info
             $borrowInfoResponse = $this->getBorrowInfo($token, $bookId);
