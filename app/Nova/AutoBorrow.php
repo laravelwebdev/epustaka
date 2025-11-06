@@ -2,7 +2,9 @@
 
 namespace App\Nova;
 
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\URL;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class AutoBorrow extends Resource
@@ -26,7 +28,8 @@ class AutoBorrow extends Resource
      */
     public static $title = 'id';
 
-    public function subtitle(){
+    public function subtitle()
+    {
         return $this->id;
     }
 
@@ -42,7 +45,6 @@ class AutoBorrow extends Resource
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function fields(NovaRequest $request)
@@ -52,13 +54,21 @@ class AutoBorrow extends Resource
                 ->sortable()
                 ->rules('nullable', 'string', 'max:255')
                 ->help('The unique identifier of the book in the iPusnas system.'),
+            Boolean::make('Borrowed', 'borrowed')
+                ->sortable()
+                ->exceptOnForms(),
+            URL::make('iPusnas Book URL', function () {
+                return $this->ipusnas_book_id
+                    ? 'https://ipusnas2.perpusnas.go.id/book/' . $this->ipusnas_book_id
+                    : null;
+            })->exceptOnForms()
+                ->label('Lihat'),
         ];
     }
 
     /**
      * Get the cards available for the request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function cards(NovaRequest $request)
@@ -69,7 +79,6 @@ class AutoBorrow extends Resource
     /**
      * Get the filters available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function filters(NovaRequest $request)
@@ -80,7 +89,6 @@ class AutoBorrow extends Resource
     /**
      * Get the lenses available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function lenses(NovaRequest $request)
@@ -91,7 +99,6 @@ class AutoBorrow extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function actions(NovaRequest $request)

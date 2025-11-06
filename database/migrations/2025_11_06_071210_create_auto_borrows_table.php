@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('auto_borrows', function (Blueprint $table) {
             $table->id();
             $table->string('ipusnas_book_id')->unique()->nullable();
+            $table->boolean('borrowed')->default(false);
             $table->timestamps();
         });
     }

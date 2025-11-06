@@ -28,7 +28,7 @@ class AutoBorrow extends Command
      */
     public function handle()
     {
-        $borrow = ModelAutoBorrow::first();
+        $borrow = ModelAutoBorrow::where('borrowed', false)->first();
         if (! $borrow) {
             $this->info('No auto borrow records found.');
 
@@ -39,6 +39,8 @@ class AutoBorrow extends Command
         $success = Book::where('ipusnas_book_id', $bookId)->exists();
         if (! $success) {
             DownloadBookFile::dispatch($accountId, $bookId, false);
+        } else {
+            $this->info('Book already borrowed.');
         }
     }
 }
