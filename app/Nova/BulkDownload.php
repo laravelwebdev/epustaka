@@ -53,8 +53,7 @@ class BulkDownload extends Resource
             Text::make('Category ID', 'category_id')
                 ->rules('required', 'max:255'),
             Text::make('Category Name', 'category_name')
-                ->rules('required', 'max:255')
-                ->exceptOnForms(),
+                ->rules('required', 'max:255'),
             Number::make('Offset', 'offset')
                 ->rules('required', 'min:0')
                 ->exceptOnForms(),
