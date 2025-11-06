@@ -28,6 +28,11 @@ class AutoBorrow extends Command
     public function handle()
     {
         $borrow = AutoBorrow::first();
+        if (! $borrow) {
+            $this->info('No auto borrow records found.');
+
+            return;
+        }
         $bookId = $borrow->ipusnas_book_id;
         $accountId = 1;
         $success = Book::where('ipusnas_book_id', $bookId)->exists();
