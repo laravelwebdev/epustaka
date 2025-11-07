@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+<!-- Coding By CodingNepal - www.codingnepalweb.com -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Beli Koin</title>
+  <title>Beli Poin</title>
   <style>
     /* Importing Google font - Open Sans */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
@@ -108,12 +109,12 @@ body {
 <body>
   <div class="container">
     <h2 class="title">Poin</h2>
-    <h3 class="price">Rp.1k<span>/poin</span></h3>
-    <p class="description">Untuk pemeliharaan website dan sewa hosting agar layanan tetap bisa diakses, penggunaan layanan membutuhkan poin.</p>
-    <b class="offer">Dapatkan Segera <br> di</b>
-    <a class="subscribe-button" href="{{ config('app.shopee') }}">Shopee</a>
+    <h3 class="price">Rp.2000<span>/poin</span></h3>
+    <p class="description">Untuk pemeliharaan website dan sewa hosting agar layanan tetap bisa diakses, penggunaan layanan membutuhkan poin. Beli poin dengan mengirimkan ke Shopeepay</p>
+    <b class="offer">Penting! Sertakan catatan email yang ingin ditambahkan poin pada saat mengirimkan uang ke Shopeepay</b>
+    <a class="subscribe-button" href="#">Bayar melalui Kirim Uang ke shopeepay 087716206091</a>
     <div class="ribbon-wrap">
-      <div class="ribbon">New</div>
+      <div class="ribbon">Beli Poin</div>
     </div>
   </div>
 </body>
