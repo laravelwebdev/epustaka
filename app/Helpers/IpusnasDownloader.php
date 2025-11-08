@@ -14,6 +14,8 @@ class IpusnasDownloader
 {
     private $accountId = null;
 
+    private $autoBorrow = false;
+
     private $apiLogin = 'https://api2-ipusnas.perpusnas.go.id/api/auth/login';
 
     private $apiBookDetail = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-detail?book_id=';
@@ -32,12 +34,13 @@ class IpusnasDownloader
         'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
     ];
 
-    public function __construct($accountId = null)
+    public function __construct($accountId = null , $autoBorrow = false)
     {
         if (isset($accountId)) {
             $this->getAccessToken($accountId);
             $this->accountId = $accountId;
         }
+        $this->autoBorrow = $autoBorrow;
     }
 
     private function getAccessToken($accountId)
@@ -227,14 +230,22 @@ class IpusnasDownloader
         }
         // borrow
         $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, optional($epustaka)['data']['id'] ?? null);
-        Log::warning('Borrow Response: ', $borrowResponse);
-        if ($borrowResponse['data']['code'] === 'SUCCESS') {
+
+        if ($this->autoBorrow) {
+            // ulangi hingga sukses (atau until code === 'SUCCESS')
+            while (! isset($borrowResponse['data']['code']) || $borrowResponse['data']['code'] !== 'SUCCESS') {
+            sleep(1);
+            $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, optional($epustaka)['data']['id'] ?? null);
+            }
+        }
+
+        if (isset($borrowResponse['data']['code']) && $borrowResponse['data']['code'] === 'SUCCESS') {
             // borrow info
             $borrowInfoResponse = $this->getBorrowInfo($token, $bookId);
             if ($borrowInfoResponse['status'] === true) {
-                $borrowInfo = $borrowInfoResponse['data'];
+            $borrowInfo = $borrowInfoResponse['data'];
             } else {
-                $error = 'Failed to get borrow info.';
+            $error = 'Failed to get borrow info.';
             }
             $this->returnBook($token, optional($borrowInfo)['data']['id']);
         } else {
