@@ -2,12 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Models\Book;
 use App\Models\Account;
+use App\Models\Book;
 use App\Models\FailedBook;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class IpusnasDownloader
@@ -239,6 +239,7 @@ class IpusnasDownloader
             $this->returnBook($token, optional($borrowInfo)['data']['id']);
         } else {
             $error = 'Gagal Meminjam Buku';
+            Log::error('Borrow Response: ', $borrowResponse);
             $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $bookId]);
             $failed->failed_borrow = true;
             $failed->save();
