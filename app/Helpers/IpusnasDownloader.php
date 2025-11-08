@@ -14,8 +14,6 @@ class IpusnasDownloader
 {
     private $accountId = null;
 
-    private $maxAttempts = 1;
-
     private $apiLogin = 'https://api2-ipusnas.perpusnas.go.id/api/auth/login';
 
     private $apiBookDetail = 'https://api2-ipusnas.perpusnas.go.id/api/webhook/book-detail?book_id=';
@@ -34,13 +32,12 @@ class IpusnasDownloader
         'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
     ];
 
-    public function __construct($accountId = null, $maxAttempts = 1)
+    public function __construct($accountId = null)
     {
         if (isset($accountId)) {
             $this->getAccessToken($accountId);
             $this->accountId = $accountId;
         }
-        $this->maxAttempts = $maxAttempts; // adjust or set to null for unlimited attempts
     }
 
     private function getAccessToken($accountId)
@@ -229,53 +226,18 @@ class IpusnasDownloader
             $error = 'Failed to get epustaka id.';
         }
         // borrow
-        $success = false;
-        $attempt = 0;
-        $maxAttempts = $this->maxAttempts; 
-
-        while (! $success && ($maxAttempts === null || $attempt < $maxAttempts)) {
-            $attempt++;
-
-            // ensure we have a fresh token each attempt
-            $token = Cache::get('ipusnas_token_'.$this->accountId);
-            if (empty($token)) {
-            $this->getAccessToken($this->accountId);
-            $token = Cache::get('ipusnas_token_'.$this->accountId);
-            }
-
-            $borrowResponse = $this->borrow(
-            $token,
-            optional($account)->ipusnas_id,
-            $bookId,
-            optional($account)->organization_id,
-            optional($epustaka)['data']['id'] ?? null
-            );
-            if (is_array($borrowResponse) && isset($borrowResponse['data']['code']) && $borrowResponse['data']['code'] === 'SUCCESS') {
-            // berhasil meminjam
-            $success = true;
-
+        $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, optional($epustaka)['data']['id'] ?? null);
+        Log::warning('Borrow Response: ', $borrowResponse);
+        if ($borrowResponse['data']['code'] === 'SUCCESS') {
+            // borrow info
             $borrowInfoResponse = $this->getBorrowInfo($token, $bookId);
             if ($borrowInfoResponse['status'] === true) {
                 $borrowInfo = $borrowInfoResponse['data'];
             } else {
                 $error = 'Failed to get borrow info.';
             }
-
             $this->returnBook($token, optional($borrowInfo)['data']['id']);
-            break;
-            }
-
-            // jika pesan berkaitan token, coba refresh token segera
-            $message = $borrowResponse['data']['message'] ?? '';
-            if (! empty($message) && stripos($message, 'token') !== false) {
-            $this->getAccessToken($this->accountId);
-            }
-
-            // jeda singkat sebelum percobaan ulang
-            sleep(1);
-        }
-
-        if (! $success) {
+        } else {
             $error = 'Gagal Meminjam Buku';
             $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $bookId]);
             $failed->failed_borrow = true;

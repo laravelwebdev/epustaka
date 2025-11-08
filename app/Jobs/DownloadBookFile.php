@@ -24,19 +24,16 @@ class DownloadBookFile implements ShouldQueue
 
     protected $notify;
 
-    protected $maxAttempts;
-
-    public function __construct($accountId, $bookIpusnasId, $notify = true, $maxAttempts = 1)
+    public function __construct($accountId, $bookIpusnasId, $notify = true)
     {
         $this->iPusnasBookId = $bookIpusnasId;
         $this->accountId = $accountId;
         $this->notify = $notify;
-        $this->maxAttempts = $maxAttempts;
     }
 
     public function handle(): void
     {
-        $download = new IpusnasDownloader($this->accountId, $this->maxAttempts);
+        $download = new IpusnasDownloader($this->accountId);
         $result = $download->getBook($this->iPusnasBookId);
         $user_id = Account::find($this->accountId)->user_id;
         $user = User::find($user_id);

@@ -38,7 +38,7 @@ class AutoBorrow extends Command
         $accountId = 1;
         $success = Book::where('ipusnas_book_id', $bookId)->exists();
         if (! $success) {
-            DownloadBookFile::dispatch($accountId, $bookId, false, null);
+            DownloadBookFile::dispatch($accountId, $bookId, false);
         } else {
             $borrow->borrowed = true;
             $borrow->save();
