@@ -36,7 +36,7 @@ class DownloadBookFile implements ShouldQueue
 
     public function handle(): void
     {
-        $download = new IpusnasDownloader($this->accountId);
+        $download = new IpusnasDownloader($this->accountId, $this->autoBorrow);
         $result = $download->getBook($this->iPusnasBookId);
         $user_id = Account::find($this->accountId)->user_id;
         $user = User::find($user_id);
