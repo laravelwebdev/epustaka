@@ -254,7 +254,7 @@ class IpusnasDownloader
             $this->returnBook($token, data_get($borrowInfo, 'data.id'));
         } else {
             $error = 'Gagal Meminjam Buku';
-            Log::error('Borrow Response: ', $borrowResponse);
+            // Log::error('Borrow Response: ', $borrowResponse);
             $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $bookId]);
             $failed->failed_borrow = true;
             $failed->save();
