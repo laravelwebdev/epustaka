@@ -229,25 +229,29 @@ class IpusnasDownloader
             $error = 'Failed to get epustaka id.';
         }
         // borrow
-        $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, optional($epustaka)['data']['id'] ?? null);
+        $epustakaId = data_get($epustaka, 'data.id');
+        $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, $epustakaId);
 
         if ($this->autoBorrow) {
-            // ulangi hingga sukses (atau until code === 'SUCCESS')
-            while (! isset($borrowResponse['data']['code']) || $borrowResponse['data']['code'] !== 'SUCCESS') {
-            sleep(1);
-            $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, optional($epustaka)['data']['id'] ?? null);
+            // ulangi hingga sukses (code === 'SUCCESS') atau maksimal 60 percobaan
+            $maxAttempts = 60;
+            $attempt = 1; // sudah melakukan 1 percobaan di atas
+            while (data_get($borrowResponse, 'data.code') !== 'SUCCESS' && $attempt < $maxAttempts) {
+                sleep(1);
+                $borrowResponse = $this->borrow($token, optional($account)->ipusnas_id, $bookId, optional($account)->organization_id, $epustakaId);
+                $attempt++;
             }
         }
 
-        if (isset($borrowResponse['data']['code']) && $borrowResponse['data']['code'] === 'SUCCESS') {
+        if (data_get($borrowResponse, 'data.code') === 'SUCCESS') {
             // borrow info
             $borrowInfoResponse = $this->getBorrowInfo($token, $bookId);
             if ($borrowInfoResponse['status'] === true) {
-            $borrowInfo = $borrowInfoResponse['data'];
+                $borrowInfo = $borrowInfoResponse['data'];
             } else {
-            $error = 'Failed to get borrow info.';
+                $error = 'Failed to get borrow info.';
             }
-            $this->returnBook($token, optional($borrowInfo)['data']['id']);
+            $this->returnBook($token, data_get($borrowInfo, 'data.id'));
         } else {
             $error = 'Gagal Meminjam Buku';
             Log::error('Borrow Response: ', $borrowResponse);

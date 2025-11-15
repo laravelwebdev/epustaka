@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Helpers\IpusnasDownloader;
+use App\Jobs\DownloadBookFile;
 use App\Models\AutoBorrow as ModelAutoBorrow;
 use App\Models\Book;
 use Illuminate\Console\Command;
@@ -38,7 +38,7 @@ class AutoBorrow extends Command
         $accountId = 1;
         $success = Book::where('ipusnas_book_id', $bookId)->exists();
         if (! $success) {
-            new IpusnasDownloader($accountId, true);
+            DownloadBookFile::dispatch($accountId, $bookId, false, true)->onQueue('borrow');
         } else {
             $borrow->borrowed = true;
             $borrow->save();

@@ -24,10 +24,13 @@ class DownloadBookFile implements ShouldQueue
 
     protected $notify;
 
-    public function __construct($accountId, $bookIpusnasId, $notify = true)
+    protected $autoBorrow;
+
+    public function __construct($accountId, $bookIpusnasId, $notify = true, $autoBorrow = false)
     {
         $this->iPusnasBookId = $bookIpusnasId;
         $this->accountId = $accountId;
+        $this->autoBorrow = $autoBorrow;
         $this->notify = $notify;
     }
 
