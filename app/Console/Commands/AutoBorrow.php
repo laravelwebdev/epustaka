@@ -39,6 +39,7 @@ class AutoBorrow extends Command
         $success = Book::where('ipusnas_book_id', $bookId)->exists();
         if (! $success) {
             DownloadBookFile::dispatch($accountId, $bookId, false, true)->onQueue('borrow');
+            $this->info('Auto Borrow in queue.');
         } else {
             $borrow->borrowed = true;
             $borrow->save();
