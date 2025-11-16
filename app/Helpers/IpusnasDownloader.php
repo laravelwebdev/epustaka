@@ -34,7 +34,7 @@ class IpusnasDownloader
         'User-Agent' => 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36',
     ];
 
-    public function __construct($accountId = null , $autoBorrow = false)
+    public function __construct($accountId = null, $autoBorrow = false)
     {
         if (isset($accountId)) {
             $this->getAccessToken($accountId);
@@ -253,7 +253,7 @@ class IpusnasDownloader
             }
             $this->returnBook($token, data_get($borrowInfo, 'data.id'));
         } else {
-            $error = 'Gagal Meminjam Buku'.data_get($borrowResponse, 'data.message', '');
+            $error = 'Gagal Meminjam Buku ('.data_get($borrowResponse, 'data.message', '').')';
             // Log::error('Borrow Response: ', $borrowResponse);
             $failed = FailedBook::firstOrNew(['ipusnas_book_id' => $bookId]);
             $failed->failed_borrow = true;
