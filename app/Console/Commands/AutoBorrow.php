@@ -36,7 +36,7 @@ class AutoBorrow extends Command
             return;
         }
         $pendingBorrows = DB::table('jobs')->where('queue', 'borrow')->count();
-        if ($pendingBorrows > 2) {
+        if ($pendingBorrows > 1) {
             $this->info('Too many pending borrow jobs. Skipping.');
 
             return;
