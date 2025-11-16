@@ -6,6 +6,7 @@ use App\Jobs\DownloadBookFile;
 use App\Models\AutoBorrow as ModelAutoBorrow;
 use App\Models\Book;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class AutoBorrow extends Command
 {
@@ -31,6 +32,12 @@ class AutoBorrow extends Command
         $borrow = ModelAutoBorrow::where('borrowed', false)->first();
         if (! $borrow) {
             $this->info('No auto borrow records found.');
+
+            return;
+        }
+        $pendingBorrows = DB::table('jobs')->where('queue', 'borrow')->count();
+        if ($pendingBorrows > 2) {
+            $this->info('Too many pending borrow jobs. Skipping.');
 
             return;
         }
