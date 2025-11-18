@@ -29,7 +29,9 @@ class AutoBorrow extends Command
      */
     public function handle()
     {
-        $borrow = ModelAutoBorrow::where('borrowed', false)->first();
+        $borrow = ModelAutoBorrow::where('borrowed', false)
+                ->orderBy('id')
+                ->first();
         if (! $borrow) {
             $this->info('No auto borrow records found.');
 
