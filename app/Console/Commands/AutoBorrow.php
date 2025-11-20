@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\DownloadBookFile;
 use App\Models\AutoBorrow as ModelAutoBorrow;
 use App\Models\Book;
+use App\Models\FailedBook;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -30,12 +31,20 @@ class AutoBorrow extends Command
     public function handle()
     {
         $borrow = ModelAutoBorrow::where('borrowed', false)
+            ->orderBy('id')
+            ->first();
+        if (! $borrow) {
+            $failedBook = FailedBook::where('failed_borrow', true)
                 ->orderBy('id')
                 ->first();
-        if (! $borrow) {
-            $this->info('No auto borrow records found.');
+            if (! $failedBook) {
+                $this->info('No auto borrow records found.');
 
-            return;
+                return;
+            }
+            $newBorrow = new ModelAutoBorrow;
+            $newBorrow->ipusnas_book_id = optional($failedBook)->ipusnas_book_id;
+            $newBorrow->save();
         }
         $pendingBorrows = DB::table('jobs')->where('queue', 'borrow')->count();
         if ($pendingBorrows > 1) {
